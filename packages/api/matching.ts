@@ -1,9 +1,13 @@
 import { supabase } from './supabase';
 import type { Match, Profile } from '@aura/types';
 
+const PARTNER_FIELDS = 'id, first_name, bio, interests, prompt_responses, favorites';
+
+export type PartnerProfile = Pick<Profile, 'id' | 'first_name' | 'bio' | 'interests' | 'prompt_responses' | 'favorites'>;
+
 export interface MatchWithPartner {
   match: Match;
-  partner: Pick<Profile, 'id' | 'first_name'>;
+  partner: PartnerProfile;
 }
 
 export async function getMatchesWithPartners(currentUserId: string): Promise<MatchWithPartner[]> {
@@ -21,7 +25,7 @@ export async function getMatchesWithPartners(currentUserId: string): Promise<Mat
 
   const { data: profiles } = await supabase
     .from('profiles')
-    .select('id, first_name')
+    .select(PARTNER_FIELDS)
     .in('id', partnerIds);
 
   const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.id, p]));
@@ -30,7 +34,7 @@ export async function getMatchesWithPartners(currentUserId: string): Promise<Mat
     const partnerId = match.user_a === currentUserId ? match.user_b : match.user_a;
     return {
       match: match as Match,
-      partner: profileMap[partnerId] ?? { id: partnerId, first_name: 'Someone' },
+      partner: profileMap[partnerId] ?? { id: partnerId, first_name: 'Someone', bio: null, interests: [], prompt_responses: [], favorites: [] },
     };
   });
 }
@@ -52,12 +56,12 @@ export async function getMatchWithPartner(
 
   const { data: partner } = await supabase
     .from('profiles')
-    .select('id, first_name')
+    .select(PARTNER_FIELDS)
     .eq('id', partnerId)
     .single();
 
   return {
     match: match as Match,
-    partner: partner ?? { id: partnerId, first_name: 'Someone' },
+    partner: partner ?? { id: partnerId, first_name: 'Someone', bio: null, interests: [], prompt_responses: [], favorites: [] },
   };
 }

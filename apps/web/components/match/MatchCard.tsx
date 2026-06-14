@@ -1,10 +1,24 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { CompatibilityBadge } from "./CompatibilityBadge";
 import type { MatchWithPartner } from "@aura/api";
+
+const CATEGORY_META: Record<string, { label: string; emoji: string }> = {
+  music:     { label: "Music",     emoji: "🎵" },
+  artists:   { label: "Artists",   emoji: "🎤" },
+  movies:    { label: "Movies",    emoji: "🎬" },
+  shows:     { label: "TV Shows",  emoji: "📺" },
+  anime:     { label: "Anime",     emoji: "⛩️" },
+  books:     { label: "Books",     emoji: "📚" },
+  games:     { label: "Games",     emoji: "🎮" },
+  podcasts:  { label: "Podcasts",  emoji: "🎙️" },
+  albums:    { label: "Albums",    emoji: "💿" },
+  directors: { label: "Directors", emoji: "🎥" },
+};
 
 interface MatchCardProps {
   matchWithPartner: MatchWithPartner;
@@ -27,6 +41,13 @@ function InitialsAvatar({ name, size = "lg" }: { name: string; size?: "sm" | "lg
 
 export function MatchCard({ matchWithPartner, currentUserId, onConnect }: MatchCardProps) {
   const { match, partner } = matchWithPartner;
+  const [expanded, setExpanded] = useState(false);
+
+  const hasExtra =
+    partner.bio ||
+    (partner.interests && partner.interests.length > 0) ||
+    (partner.prompt_responses && partner.prompt_responses.length > 0) ||
+    (partner.favorites && partner.favorites.length > 0);
 
   return (
     <motion.div
@@ -34,46 +55,142 @@ export function MatchCard({ matchWithPartner, currentUserId, onConnect }: MatchC
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
     >
-      <Card className="p-5">
-        {/* Header: avatars + name + badge */}
-        <div className="flex items-center gap-4 mb-4">
-          {/* Interlocking circles avatar */}
-          <div className="relative flex shrink-0">
-            <InitialsAvatar name="Me" size="sm" />
-            <div className="-ml-3">
-              <InitialsAvatar name={partner.first_name} size="sm" />
+      <Card className="overflow-hidden">
+        {/* Header */}
+        <div className="p-5">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="relative flex shrink-0">
+              <InitialsAvatar name="Me" size="sm" />
+              <div className="-ml-3">
+                <InitialsAvatar name={partner.first_name} size="sm" />
+              </div>
+            </div>
+            <div className="flex flex-col gap-1 min-w-0">
+              <p className="font-semibold text-ink text-base leading-tight">
+                {partner.first_name}
+              </p>
+              <CompatibilityBadge score={Math.round(match.compatibility_score)} size="sm" />
             </div>
           </div>
-          <div className="flex flex-col gap-1 min-w-0">
-            <p className="font-semibold text-ink text-base leading-tight">
-              {partner.first_name}
-            </p>
-            <CompatibilityBadge score={Math.round(match.compatibility_score)} size="sm" />
-          </div>
+
+          {/* Shared highlights */}
+          {match.shared_highlights && match.shared_highlights.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {match.shared_highlights.slice(0, 3).map((h, i) => (
+                <span
+                  key={i}
+                  className="text-xs text-ink-secondary bg-surface rounded-full px-3 py-1 border border-divider capitalize"
+                >
+                  {h}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* View profile toggle */}
+          {hasExtra && (
+            <button
+              onClick={() => setExpanded((v) => !v)}
+              className="w-full text-sm text-primary font-medium flex items-center justify-center gap-1.5 py-2 rounded-xl hover:bg-primary-pale transition-colors mb-3"
+            >
+              {expanded ? "Hide profile" : "View profile"}
+              <svg
+                className={`w-4 h-4 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          )}
+
+          <Button variant="primary" size="sm" onClick={onConnect} className="w-full">
+            Start conversation
+          </Button>
         </div>
 
-        {/* Shared highlights */}
-        {match.shared_highlights && match.shared_highlights.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {match.shared_highlights.slice(0, 3).map((highlight, i) => (
-              <span
-                key={i}
-                className="text-xs text-ink-secondary bg-surface rounded-full px-3 py-1 border border-divider"
-              >
-                {highlight}
-              </span>
-            ))}
-          </div>
-        )}
+        {/* Expandable profile */}
+        <AnimatePresence initial={false}>
+          {expanded && hasExtra && (
+            <motion.div
+              key="profile"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+              className="overflow-hidden"
+            >
+              <div className="border-t border-divider px-5 py-4 flex flex-col gap-5">
 
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={onConnect}
-          className="w-full"
-        >
-          Start conversation
-        </Button>
+                {/* Bio */}
+                {partner.bio && (
+                  <div>
+                    <p className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-2">About</p>
+                    <p className="text-sm text-ink leading-relaxed">{partner.bio}</p>
+                  </div>
+                )}
+
+                {/* Interests */}
+                {partner.interests && partner.interests.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-2">Interests</p>
+                    <div className="flex flex-wrap gap-2">
+                      {partner.interests.map((interest) => (
+                        <span
+                          key={interest}
+                          className="text-xs bg-primary-pale text-primary font-medium px-3 py-1.5 rounded-full"
+                        >
+                          {interest}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Prompts */}
+                {partner.prompt_responses && partner.prompt_responses.length > 0 && (
+                  <div className="flex flex-col gap-3">
+                    {partner.prompt_responses.map((pr, i) => (
+                      <div key={i} className="bg-surface rounded-2xl p-4">
+                        <p className="text-xs text-ink-muted mb-1">{pr.prompt}</p>
+                        <p className="text-sm text-ink font-medium leading-snug">{pr.answer}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Favourites */}
+                {partner.favorites && partner.favorites.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-3">Favourites</p>
+                    <div className="flex flex-col gap-3">
+                      {partner.favorites.map((fav) => {
+                        const meta = CATEGORY_META[fav.category];
+                        return (
+                          <div key={fav.category}>
+                            <p className="text-xs text-ink-secondary font-medium mb-1.5">
+                              {meta?.emoji} {meta?.label ?? fav.category}
+                            </p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {fav.items.map((item) => (
+                                <span
+                                  key={item}
+                                  className="text-xs bg-surface border border-divider text-ink px-2.5 py-1 rounded-full"
+                                >
+                                  {item}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </Card>
     </motion.div>
   );
