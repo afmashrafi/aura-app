@@ -45,6 +45,15 @@
   100% { opacity: 0; transform: scale(1); }
 }
 
+/* Hide scrollbar but keep scrollable */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Base */
 body {
   background-color: #FFFFFF;

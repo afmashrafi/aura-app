@@ -21,6 +21,7 @@ import type { Question } from "@aura/types";
 import { useAuth } from "@/app/providers";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { SocialMediaShelf } from "@/components/profile/SocialMediaShelf";
 
 const CATEGORY_NAMES: Record<string, string> = {
   values: "Values",
@@ -184,29 +185,17 @@ export default function ProfilePage() {
           </section>
         )}
 
-        {/* Social links */}
+        {/* Social shelves */}
         {socialLinks.length > 0 && (
-          <section className="mb-6">
-            <h2 className="font-display text-[18px] font-bold text-ink mb-3">Socials</h2>
-            <div className="flex flex-wrap gap-2">
-              {socialLinks.map((link) => {
-                const meta = SOCIAL_META[link.platform];
-                if (!meta) return null;
-                return (
-                  <a
-                    key={link.platform}
-                    href={meta.url(link.username)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-3 py-2 rounded-full border-2 text-sm font-semibold transition-all hover:scale-105"
-                    style={{ borderColor: meta.color, color: meta.color, backgroundColor: meta.bg }}
-                  >
-                    <span>{meta.label}</span>
-                    <span className="text-xs opacity-70">@{link.username}</span>
-                  </a>
-                );
-              })}
-            </div>
+          <section className="mb-6 flex flex-col gap-6">
+            <h2 className="font-display text-[18px] font-bold text-ink">Socials</h2>
+            {socialLinks.map((link) => (
+              <SocialMediaShelf
+                key={link.platform}
+                platform={link.platform}
+                username={link.username}
+              />
+            ))}
           </section>
         )}
 
