@@ -47,6 +47,12 @@ export default function ProfileSetupPage() {
       });
       setDone(true);
       refreshProfile().catch(() => {});
+      // Re-run matching in background so new profile data is considered
+      fetch("/api/match", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id }),
+      }).catch(() => {});
       setTimeout(() => router.push("/matches"), 2200);
     } catch (err: unknown) {
       const msg =

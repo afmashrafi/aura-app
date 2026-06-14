@@ -101,6 +101,12 @@ export default function QuestionnairePage() {
     setCompleting(true);
     try {
       await completeQuestionnaire(user.id);
+      // Run matching in background — don't block navigation if it fails
+      fetch("/api/match", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id }),
+      }).catch(() => {});
       await refreshProfile();
       router.push("/profile-setup");
     } finally {
