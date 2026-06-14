@@ -8,27 +8,31 @@ export async function GET(req: NextRequest) {
 
   try {
     const res = await fetch(
-      `https://api.jikan.moe/v4/users/${encodeURIComponent(username)}/animelist?limit=6&order_by=updated_at&sort=desc`,
-      { next: { revalidate: 3600 } }
+      `https://api.jikan.moe/v4/users/${encodeURIComponent(username)}/animelist?limit=6&order_by=updated_at&sort=desc`
     );
-    if (!res.ok) return NextResponse.json({ error: "User not found or list is private" }, { status: 404 });
+
+    if (!res.ok) {
+      return NextResponse.json({ error: "User not found or list is private" }, { status: 404 });
+    }
 
     const json = await res.json();
     const items = (json.data ?? []).map((item: {
-      entry: { mal_id: number; title: string; images: { jpg: { image_url: string } }; url: string };
+      entry: { mal_id: number; title: string; images: { jpg: { image_url: string } } };
       score: number;
       status: string;
     }) => ({
       id: item.entry.mal_id,
       title: item.entry.title,
-      image: item.entry.images.jpg.image_url,
-      score: item.score,
-      status: item.status,
-      url: item.entry.url,
+      image: item.entry.images?.jpg?.image_url ?? null,
+      score: item.score ?? 0,
+      status: item.status ?? "",
     }));
 
-    return NextResponse.json({ items });
-  } catch {
+    return NextResponse.json({ items }, {
+      headers: { "Cache-Control": "public, s-maxage=3600" },
+    });
+  } catch (e) {
+    console.error("MAL fetch error:", e);
     return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
   }
 }
