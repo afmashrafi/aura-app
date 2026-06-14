@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Aura",
+    "slug": "aura-dating",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#7C3AED"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "backgroundColor": "#7C3AED"
+      },
+      "package": "com.aura.dating",
+      "versionCode": 1,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "react-native-webview"
+    ]
+  }
+}
