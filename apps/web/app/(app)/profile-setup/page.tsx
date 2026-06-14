@@ -4,18 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { updateProfileSetup } from "@aura/api";
-import type { PromptResponse, SocialLink } from "@aura/types";
+import type { PromptResponse, FavoriteCategory } from "@aura/types";
 import { useAuth } from "@/app/providers";
 import { Button } from "@/components/ui/Button";
 import { InterestsPicker } from "@/components/profile/InterestsPicker";
 import { PromptsPicker } from "@/components/profile/PromptsPicker";
-import { SocialLinksPicker } from "@/components/profile/SocialLinksPicker";
+import { FavoritesPicker } from "@/components/profile/FavoritesPicker";
 
 const STEPS = [
-  { label: "About you", emoji: "✍️" },
-  { label: "Interests", emoji: "✨" },
-  { label: "Prompts", emoji: "💬" },
-  { label: "Socials", emoji: "🎵" },
+  { label: "About you",  emoji: "✍️" },
+  { label: "Interests",  emoji: "✨" },
+  { label: "Prompts",    emoji: "💬" },
+  { label: "Favourites", emoji: "❤️" },
 ] as const;
 
 export default function ProfileSetupPage() {
@@ -26,7 +26,7 @@ export default function ProfileSetupPage() {
   const [bio, setBio] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
   const [promptResponses, setPromptResponses] = useState<PromptResponse[]>([]);
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
+  const [favorites, setFavorites] = useState<FavoriteCategory[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
@@ -43,32 +43,43 @@ export default function ProfileSetupPage() {
         bio: bio.trim() || undefined,
         interests,
         prompt_responses: filledResponses,
-        social_links: socialLinks,
+        favorites,
       });
       setDone(true);
-      // Refresh profile in background, then navigate
       refreshProfile().catch(() => {});
       setTimeout(() => router.push("/matches"), 2200);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message
-        : (typeof err === "object" && err !== null && "message" in err)
-        ? String((err as { message: unknown }).message)
-        : "Something went wrong. Please try again.";
+      const msg =
+        err instanceof Error
+          ? err.message
+          : typeof err === "object" && err !== null && "message" in err
+          ? String((err as { message: unknown }).message)
+          : "Something went wrong. Please try again.";
       setError(msg);
     } finally {
       setSaving(false);
     }
   }
 
+  // Validation per step
+  const favoritesValid =
+    favorites.length >= 1 &&
+    favorites.every((f) => f.items.length >= 3);
+
   const canAdvance =
     step === 0 ? true :
     step === 1 ? interests.length >= 3 :
-    true;
+    step === 2 ? true :
+    favoritesValid;
 
   const ctaLabel =
     step < STEPS.length - 1
       ? step === 1 && interests.length < 3
         ? `Select ${3 - interests.length} more`
+        : step === 3 && !favoritesValid
+        ? favorites.length === 0
+          ? "Pick at least one category"
+          : "Add 3+ to each category"
         : "Continue"
       : saving
       ? "Saving…"
@@ -77,7 +88,10 @@ export default function ProfileSetupPage() {
   // All done screen
   if (done) {
     return (
-      <div className="flex flex-col items-center justify-center bg-white text-center px-6" style={{ height: "100dvh" }}>
+      <div
+        className="flex flex-col items-center justify-center bg-white text-center px-6"
+        style={{ height: "100dvh" }}
+      >
         <motion.div
           initial={{ scale: 0.6, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -169,7 +183,7 @@ export default function ProfileSetupPage() {
                 initial={{ opacity: 0, x: 24 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -24 }}
-                transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+                transition={{ duration: 0.22 }}
               >
                 <h1 className="font-display text-2xl font-bold text-ink mb-1">
                   Introduce yourself
@@ -202,7 +216,7 @@ export default function ProfileSetupPage() {
                 initial={{ opacity: 0, x: 24 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -24 }}
-                transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+                transition={{ duration: 0.22 }}
               >
                 <h1 className="font-display text-2xl font-bold text-ink mb-1">
                   What are you into?
@@ -220,7 +234,7 @@ export default function ProfileSetupPage() {
                 initial={{ opacity: 0, x: 24 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -24 }}
-                transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+                transition={{ duration: 0.22 }}
               >
                 <h1 className="font-display text-2xl font-bold text-ink mb-1">
                   Tell your story
@@ -240,26 +254,26 @@ export default function ProfileSetupPage() {
 
             {step === 3 && (
               <motion.div
-                key="socials"
+                key="favorites"
                 initial={{ opacity: 0, x: 24 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -24 }}
-                transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+                transition={{ duration: 0.22 }}
               >
                 <h1 className="font-display text-2xl font-bold text-ink mb-1">
-                  Your socials
+                  Your favourites
                 </h1>
                 <p className="text-sm text-ink-secondary mb-5">
-                  Link your accounts so matches can see what you're into.
+                  Pick what you want to share, then add at least 3 in each.
                 </p>
-                <SocialLinksPicker links={socialLinks} onChange={setSocialLinks} />
+                <FavoritesPicker favorites={favorites} onChange={setFavorites} />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </div>
 
-      {/* Sticky footer — always visible, not covered by keyboard */}
+      {/* Sticky footer */}
       <div className="shrink-0 bg-white border-t border-divider px-4 py-4">
         {error && (
           <p className="text-center text-sm text-danger mb-3 max-w-lg mx-auto">{error}</p>

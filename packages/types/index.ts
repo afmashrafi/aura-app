@@ -3,6 +3,11 @@ export interface SocialLink {
   username: string;
 }
 
+export interface FavoriteCategory {
+  category: string;
+  items: string[];
+}
+
 export interface Profile {
   id: string;
   first_name: string;
@@ -14,6 +19,7 @@ export interface Profile {
   interests: string[];
   prompt_responses: PromptResponse[];
   social_links: SocialLink[];
+  favorites: FavoriteCategory[];
   created_at: string;
 }
 

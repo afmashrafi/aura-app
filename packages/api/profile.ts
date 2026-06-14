@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { PromptResponse, SocialLink } from '@aura/types';
+import type { PromptResponse, SocialLink, FavoriteCategory } from '@aura/types';
 
 export async function updateBio(userId: string, bio: string) {
   const { error } = await supabase
@@ -32,6 +32,7 @@ export async function updateProfileSetup(
     interests?: string[];
     prompt_responses?: PromptResponse[];
     social_links?: SocialLink[];
+    favorites?: FavoriteCategory[];
   }
 ) {
   // Strip undefined so Supabase doesn't try to null out existing fields
