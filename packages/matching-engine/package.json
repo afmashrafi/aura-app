@@ -1,0 +1,10 @@
+{
+  "name": "@aura/matching-engine",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./score.ts",
+  "types": "./score.ts",
+  "dependencies": {
+    "@aura/types": "*"
+  }
+}
