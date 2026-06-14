@@ -32,6 +32,19 @@ async function fetchProfile(userId: string): Promise<Profile | null> {
   return data ?? null;
 }
 
+async function runMatchingInBackground(userId: string) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) return;
+  fetch("/api/match", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({ userId }),
+  }).catch(() => {});
+}
+
 export function Providers({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -50,6 +63,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       if (u) {
         const p = await fetchProfile(u.id);
         setProfile(p);
+        if (p?.questionnaire_completed) runMatchingInBackground(u.id);
       }
       setLoading(false);
     });
@@ -62,6 +76,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       if (u) {
         const p = await fetchProfile(u.id);
         setProfile(p);
+        if (p?.questionnaire_completed) runMatchingInBackground(u.id);
       } else {
         setProfile(null);
       }
