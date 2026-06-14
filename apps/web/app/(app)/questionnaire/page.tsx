@@ -8,6 +8,7 @@ import {
   completeQuestionnaire,
   getUserAnswers,
   saveAnswer,
+  supabase,
 } from "@aura/api";
 import { useAuth } from "@/app/providers";
 import { Button } from "@/components/ui/Button";
@@ -102,11 +103,17 @@ export default function QuestionnairePage() {
     try {
       await completeQuestionnaire(user.id);
       // Run matching in background — don't block navigation if it fails
-      fetch("/api/match", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id }),
-      }).catch(() => {});
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!session?.access_token) return;
+        fetch("/api/match", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ userId: user.id }),
+        }).catch(() => {});
+      });
       await refreshProfile();
       router.push("/profile-setup");
     } finally {

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { updateProfileSetup } from "@aura/api";
+import { updateProfileSetup, supabase } from "@aura/api";
 import type { PromptResponse, FavoriteCategory } from "@aura/types";
 import { useAuth } from "@/app/providers";
 import { Button } from "@/components/ui/Button";
@@ -48,11 +48,17 @@ export default function ProfileSetupPage() {
       setDone(true);
       refreshProfile().catch(() => {});
       // Re-run matching in background so new profile data is considered
-      fetch("/api/match", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id }),
-      }).catch(() => {});
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!session?.access_token) return;
+        fetch("/api/match", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ userId: user.id }),
+        }).catch(() => {});
+      });
       setTimeout(() => router.push("/matches"), 2200);
     } catch (err: unknown) {
       const msg =

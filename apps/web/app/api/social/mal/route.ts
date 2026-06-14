@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "edge";
 
+const SAFE_USERNAME = /^[a-zA-Z0-9_\-.]{1,50}$/;
+
 export async function GET(req: NextRequest) {
   const username = req.nextUrl.searchParams.get("username");
-  if (!username) return NextResponse.json({ error: "username required" }, { status: 400 });
+  if (!username || !SAFE_USERNAME.test(username)) {
+    return NextResponse.json({ error: "invalid username" }, { status: 400 });
+  }
 
   try {
     const res = await fetch(

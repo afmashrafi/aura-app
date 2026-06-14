@@ -12,9 +12,11 @@ export function MessageInput({ onSend, disabled = false }: MessageInputProps) {
   const [sending, setSending] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const MAX_LENGTH = 2000;
+
   async function handleSend() {
     const trimmed = value.trim();
-    if (!trimmed || sending || disabled) return;
+    if (!trimmed || sending || disabled || trimmed.length > MAX_LENGTH) return;
     setSending(true);
     setValue("");
     try {
@@ -37,7 +39,7 @@ export function MessageInput({ onSend, disabled = false }: MessageInputProps) {
       <textarea
         ref={textareaRef}
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => setValue(e.target.value.slice(0, 2000))}
         onKeyDown={handleKeyDown}
         placeholder="Type a message…"
         rows={1}

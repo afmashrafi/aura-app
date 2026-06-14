@@ -11,8 +11,29 @@ const WEIGHTS: Record<string, number> = {
 };
 
 export async function POST(req: NextRequest) {
+  // Verify the caller is authenticated and is the user they claim to be
+  const authHeader = req.headers.get("authorization");
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { userId } = await req.json();
   if (!userId) return NextResponse.json({ error: "userId required" }, { status: 400 });
+
+  // Validate the JWT against Supabase using the anon key (no service key needed here)
+  const verifyClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${token}` } }, auth: { persistSession: false } }
+  );
+  const { data: { user: caller }, error: authErr } = await verifyClient.auth.getUser();
+  if (authErr || !caller) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (caller.id !== userId) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceKey) {
