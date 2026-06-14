@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { PromptResponse } from '@aura/types';
+import type { PromptResponse, SocialLink } from '@aura/types';
 
 export async function updateBio(userId: string, bio: string) {
   const { error } = await supabase
@@ -27,11 +27,20 @@ export async function updatePromptResponses(userId: string, prompt_responses: Pr
 
 export async function updateProfileSetup(
   userId: string,
-  data: { bio?: string; interests?: string[]; prompt_responses?: PromptResponse[]; social_links?: import('@aura/types').SocialLink[] }
+  data: {
+    bio?: string;
+    interests?: string[];
+    prompt_responses?: PromptResponse[];
+    social_links?: SocialLink[];
+  }
 ) {
+  // Strip undefined so Supabase doesn't try to null out existing fields
+  const payload = Object.fromEntries(
+    Object.entries(data).filter(([, v]) => v !== undefined)
+  );
   const { error } = await supabase
     .from('profiles')
-    .update(data)
+    .update(payload)
     .eq('id', userId);
   if (error) throw error;
 }

@@ -28,10 +28,13 @@ export default function ProfileSetupPage() {
   const [promptResponses, setPromptResponses] = useState<PromptResponse[]>([]);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
 
   async function handleFinish() {
     if (!user) return;
     setSaving(true);
+    setError(null);
     try {
       const filledResponses = promptResponses.filter(
         (r) => r.prompt && r.answer.trim()
@@ -42,8 +45,16 @@ export default function ProfileSetupPage() {
         prompt_responses: filledResponses,
         social_links: socialLinks,
       });
-      await refreshProfile();
-      router.push("/matches");
+      setDone(true);
+      // Refresh profile in background, then navigate
+      refreshProfile().catch(() => {});
+      setTimeout(() => router.push("/matches"), 2200);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message
+        : (typeof err === "object" && err !== null && "message" in err)
+        ? String((err as { message: unknown }).message)
+        : "Something went wrong. Please try again.";
+      setError(msg);
     } finally {
       setSaving(false);
     }
@@ -62,6 +73,55 @@ export default function ProfileSetupPage() {
       : saving
       ? "Saving…"
       : "Finish setup";
+
+  // All done screen
+  if (done) {
+    return (
+      <div className="flex flex-col items-center justify-center bg-white text-center px-6" style={{ height: "100dvh" }}>
+        <motion.div
+          initial={{ scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ ease: [0.34, 1.56, 0.64, 1], duration: 0.5 }}
+          className="w-24 h-24 rounded-full bg-primary-pale flex items-center justify-center mb-6"
+        >
+          <svg className="w-12 h-12 text-primary" viewBox="0 0 48 48" fill="none">
+            <path
+              d="M10 24l10 10 18-20"
+              stroke="currentColor"
+              strokeWidth="3.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </motion.div>
+        <motion.h1
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="font-display text-3xl font-bold text-ink mb-2"
+        >
+          You're all set!
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="text-ink-secondary text-base mb-8"
+        >
+          Your profile is ready. Let's find your match.
+        </motion.p>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <Button onClick={() => router.push("/matches")} className="px-10">
+            See my matches
+          </Button>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col bg-white" style={{ height: "100dvh" }}>
@@ -201,6 +261,9 @@ export default function ProfileSetupPage() {
 
       {/* Sticky footer — always visible, not covered by keyboard */}
       <div className="shrink-0 bg-white border-t border-divider px-4 py-4">
+        {error && (
+          <p className="text-center text-sm text-danger mb-3 max-w-lg mx-auto">{error}</p>
+        )}
         <div className="max-w-lg mx-auto flex gap-3">
           {step > 0 && (
             <button
