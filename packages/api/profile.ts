@@ -27,7 +27,7 @@ export async function updatePromptResponses(userId: string, prompt_responses: Pr
 
 export async function updateProfileSetup(
   userId: string,
-  data: { bio?: string; interests?: string[]; prompt_responses?: PromptResponse[] }
+  data: { bio?: string; interests?: string[]; prompt_responses?: PromptResponse[]; social_links?: import('@aura/types').SocialLink[] }
 ) {
   const { error } = await supabase
     .from('profiles')

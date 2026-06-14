@@ -71,8 +71,15 @@ export default function QuestionnairePage() {
         savingRef.current = false;
         setSaving(false);
       }
+      // Auto-advance after a brief pause so the selection is visible
+      if (currentIndex < QUESTIONS.length - 1) {
+        setTimeout(() => {
+          setDirection(1);
+          setCurrentIndex((i) => i + 1);
+        }, 380);
+      }
     },
-    [user, question]
+    [user, question, currentIndex]
   );
 
   async function handleNext() {

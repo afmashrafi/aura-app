@@ -1,3 +1,8 @@
+export interface SocialLink {
+  platform: 'spotify' | 'letterboxd' | 'myanimelist' | 'goodreads';
+  username: string;
+}
+
 export interface Profile {
   id: string;
   first_name: string;
@@ -8,6 +13,7 @@ export interface Profile {
   bio: string | null;
   interests: string[];
   prompt_responses: PromptResponse[];
+  social_links: SocialLink[];
   created_at: string;
 }
 

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { INTEREST_CATEGORIES, INTERESTS } from "@aura/api";
 
+const MIN_INTERESTS = 3;
 const MAX_INTERESTS = 6;
 
 interface InterestsPickerProps {
@@ -20,19 +21,41 @@ export function InterestsPicker({ selected, onChange }: InterestsPickerProps) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <p className="text-sm text-ink-muted text-center">
-        {selected.length} / {MAX_INTERESTS} selected
-      </p>
+    <div className="flex flex-col gap-8">
+      {/* Count indicator */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-ink-muted">
+          {selected.length < MIN_INTERESTS
+            ? `Pick at least ${MIN_INTERESTS - selected.length} more`
+            : selected.length === MAX_INTERESTS
+            ? "You're all set!"
+            : `${MAX_INTERESTS - selected.length} more you can add`}
+        </p>
+        <div className="flex gap-1">
+          {Array.from({ length: MAX_INTERESTS }).map((_, i) => (
+            <div
+              key={i}
+              className={`h-1.5 w-6 rounded-full transition-all duration-300 ${
+                i < selected.length ? "bg-primary" : "bg-divider"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
 
-      {INTEREST_CATEGORIES.map((cat) => {
+      {INTEREST_CATEGORIES.map((cat, catIdx) => {
         const items = INTERESTS.filter((i) => i.category === cat);
         return (
-          <div key={cat}>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-muted mb-3">
+          <motion.div
+            key={cat}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: catIdx * 0.06, duration: 0.3 }}
+          >
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-ink-muted mb-3">
               {cat}
             </h3>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="flex flex-wrap gap-2">
               {items.map((interest) => {
                 const isSelected = selected.includes(interest.id);
                 const isDisabled = !isSelected && selected.length >= MAX_INTERESTS;
@@ -43,38 +66,26 @@ export function InterestsPicker({ selected, onChange }: InterestsPickerProps) {
                     type="button"
                     onClick={() => toggle(interest.id)}
                     disabled={isDisabled}
-                    whileTap={{ scale: 0.94 }}
-                    transition={{ duration: 0.12 }}
-                    className={`relative flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl border-2 transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring
+                    whileTap={{ scale: 0.92 }}
+                    transition={{ duration: 0.1 }}
+                    className={`
+                      flex items-center gap-2 px-4 py-2.5 rounded-full border-2 text-sm font-medium
+                      transition-all duration-200 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring
                       ${isSelected
-                        ? "border-primary bg-primary-pale shadow-[0_2px_12px_rgba(124,58,237,0.15)]"
+                        ? "border-primary bg-primary text-white shadow-[0_4px_14px_rgba(124,58,237,0.3)]"
                         : isDisabled
-                        ? "border-divider bg-surface opacity-40 cursor-not-allowed"
-                        : "border-divider bg-white hover:border-primary-light hover:bg-surface"
-                      }`}
+                        ? "border-divider bg-surface text-ink-muted opacity-40 cursor-not-allowed"
+                        : "border-divider bg-white text-ink hover:border-primary-light hover:bg-primary-pale hover:text-primary"
+                      }
+                    `}
                   >
-                    {/* Selected checkmark */}
-                    {isSelected && (
-                      <motion.div
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-primary flex items-center justify-center"
-                      >
-                        <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 10 10" fill="none">
-                          <path d="M2 5l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </motion.div>
-                    )}
-
-                    <span className="text-2xl leading-none">{interest.emoji}</span>
-                    <span className={`text-xs font-medium text-center leading-tight ${isSelected ? "text-primary" : "text-ink"}`}>
-                      {interest.label}
-                    </span>
+                    <span className="text-base leading-none">{interest.emoji}</span>
+                    <span>{interest.label}</span>
                   </motion.button>
                 );
               })}
             </div>
-          </div>
+          </motion.div>
         );
       })}
     </div>

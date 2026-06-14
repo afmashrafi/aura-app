@@ -10,6 +10,13 @@ import {
   saveAnswer,
   completeQuestionnaire,
 } from "@aura/api";
+
+const SOCIAL_META: Record<string, { label: string; color: string; bg: string; url: (u: string) => string }> = {
+  spotify: { label: "Spotify", color: "#1DB954", bg: "#F0FDF4", url: (u) => `https://open.spotify.com/user/${u}` },
+  letterboxd: { label: "Letterboxd", color: "#00C030", bg: "#F0FFF4", url: (u) => `https://letterboxd.com/${u}` },
+  myanimelist: { label: "MyAnimeList", color: "#2E51A2", bg: "#EFF6FF", url: (u) => `https://myanimelist.net/profile/${u}` },
+  goodreads: { label: "Goodreads", color: "#553B08", bg: "#FFFBEB", url: (u) => `https://goodreads.com/${u}` },
+};
 import type { Question } from "@aura/types";
 import { useAuth } from "@/app/providers";
 import { Button } from "@/components/ui/Button";
@@ -75,6 +82,7 @@ export default function ProfilePage() {
     .filter(Boolean);
 
   const promptResponses = profile?.prompt_responses ?? [];
+  const socialLinks = profile?.social_links ?? [];
 
   if (!loaded) {
     return (
@@ -172,6 +180,32 @@ export default function ProfilePage() {
                   </div>
                 </Card>
               ))}
+            </div>
+          </section>
+        )}
+
+        {/* Social links */}
+        {socialLinks.length > 0 && (
+          <section className="mb-6">
+            <h2 className="font-display text-[18px] font-bold text-ink mb-3">Socials</h2>
+            <div className="flex flex-wrap gap-2">
+              {socialLinks.map((link) => {
+                const meta = SOCIAL_META[link.platform];
+                if (!meta) return null;
+                return (
+                  <a
+                    key={link.platform}
+                    href={meta.url(link.username)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-3 py-2 rounded-full border-2 text-sm font-semibold transition-all hover:scale-105"
+                    style={{ borderColor: meta.color, color: meta.color, backgroundColor: meta.bg }}
+                  >
+                    <span>{meta.label}</span>
+                    <span className="text-xs opacity-70">@{link.username}</span>
+                  </a>
+                );
+              })}
             </div>
           </section>
         )}
