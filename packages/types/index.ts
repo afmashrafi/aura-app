@@ -5,7 +5,15 @@ export interface Profile {
   gender: string;
   interested_in: string[];
   questionnaire_completed: boolean;
+  bio: string | null;
+  interests: string[];
+  prompt_responses: PromptResponse[];
   created_at: string;
+}
+
+export interface PromptResponse {
+  prompt: string;
+  answer: string;
 }
 
 export interface Answer {
@@ -41,4 +49,11 @@ export interface Question {
   category: 'values' | 'lifestyle' | 'goals' | 'dealbreakers';
   text: string;
   options: [string, string, string, string];
+}
+
+export interface Interest {
+  id: string;
+  label: string;
+  emoji: string;
+  category: string;
 }

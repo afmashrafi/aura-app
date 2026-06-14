@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
   QUESTIONS,
+  INTERESTS,
   getUserAnswers,
   saveAnswer,
   completeQuestionnaire,
@@ -31,6 +33,7 @@ function groupByCategory(questions: Question[]) {
 
 export default function ProfilePage() {
   const { user, profile } = useAuth();
+  const router = useRouter();
   const [answers, setAnswers] = useState<Record<number, 0 | 1 | 2 | 3>>({});
   const [editing, setEditing] = useState<number | null>(null);
   const [saving, setSaving] = useState<number | null>(null);
@@ -67,6 +70,12 @@ export default function ProfilePage() {
   const categorized = groupByCategory(QUESTIONS);
   const completedCount = Object.keys(answers).length;
 
+  const interestItems = (profile?.interests ?? [])
+    .map((id) => INTERESTS.find((i) => i.id === id))
+    .filter(Boolean);
+
+  const promptResponses = profile?.prompt_responses ?? [];
+
   if (!loaded) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -83,11 +92,11 @@ export default function ProfilePage() {
         transition={{ duration: 0.35 }}
       >
         {/* Profile header */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 mb-4">
           <div className="w-16 h-16 rounded-full bg-primary-pale flex items-center justify-center font-display text-2xl text-primary font-semibold">
             {profile?.first_name?.charAt(0).toUpperCase() ?? "?"}
           </div>
-          <div>
+          <div className="flex-1">
             <h1 className="font-display text-[22px] text-ink">
               {profile?.first_name}
             </h1>
@@ -95,10 +104,17 @@ export default function ProfilePage() {
               {completedCount} of {QUESTIONS.length} questions answered
             </p>
           </div>
+          <button
+            type="button"
+            onClick={() => router.push("/profile-setup")}
+            className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+          >
+            Edit profile
+          </button>
         </div>
 
         {/* Completion bar */}
-        <div className="mb-8">
+        <div className="mb-6">
           <div className="w-full h-1.5 bg-surface-deep rounded-full overflow-hidden">
             <div
               className="h-full bg-primary-light rounded-full transition-[width] duration-500"
@@ -106,6 +122,59 @@ export default function ProfilePage() {
             />
           </div>
         </div>
+
+        {/* Bio */}
+        {profile?.bio && (
+          <section className="mb-6">
+            <h2 className="font-display text-[18px] text-ink mb-2">About me</h2>
+            <Card elevated={false}>
+              <p className="px-4 py-3.5 text-base text-ink leading-relaxed">
+                {profile.bio}
+              </p>
+            </Card>
+          </section>
+        )}
+
+        {/* Interests */}
+        {interestItems.length > 0 && (
+          <section className="mb-6">
+            <h2 className="font-display text-[18px] text-ink mb-3">Interests</h2>
+            <div className="flex flex-wrap gap-2">
+              {interestItems.map((interest) => (
+                <div
+                  key={interest!.id}
+                  className="flex items-center gap-2 px-3 py-2 rounded-full bg-primary-pale border border-primary/20"
+                >
+                  <span className="text-lg leading-none">{interest!.emoji}</span>
+                  <span className="text-sm font-medium text-primary">
+                    {interest!.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Prompts */}
+        {promptResponses.length > 0 && (
+          <section className="mb-6">
+            <h2 className="font-display text-[18px] text-ink mb-3">Prompts</h2>
+            <div className="flex flex-col gap-3">
+              {promptResponses.map((pr, i) => (
+                <Card key={i} elevated={false}>
+                  <div className="px-4 py-3.5">
+                    <p className="text-xs font-semibold text-primary mb-1.5">
+                      {pr.prompt}
+                    </p>
+                    <p className="text-base text-ink leading-relaxed">
+                      {pr.answer}
+                    </p>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Questions by category */}
         <div className="flex flex-col gap-8">
@@ -122,7 +191,6 @@ export default function ProfilePage() {
 
                   return (
                     <Card key={question.id} elevated={false} className="overflow-hidden">
-                      {/* Question row */}
                       <button
                         type="button"
                         onClick={() =>
@@ -159,7 +227,6 @@ export default function ProfilePage() {
                         </svg>
                       </button>
 
-                      {/* Inline edit options */}
                       <AnimatePresence>
                         {isEditing && (
                           <motion.div

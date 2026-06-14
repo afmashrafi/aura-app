@@ -40,7 +40,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.4 }}
-          className="font-display text-[42px] leading-tight text-ink mb-3"
+          className="font-brand text-[42px] leading-tight text-ink mb-3"
         >
           Aura
         </motion.h1>

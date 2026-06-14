@@ -55,6 +55,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     ) {
       router.replace("/questionnaire");
     }
+    if (
+      profile &&
+      profile.questionnaire_completed &&
+      pathname === "/questionnaire"
+    ) {
+      router.replace("/profile-setup");
+    }
   }, [user, profile, loading, pathname, router]);
 
   if (loading) {
@@ -75,7 +82,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {!isQuestionnaire && (
         <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-divider">
           <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-            <Link href="/matches" className="font-display text-xl text-ink">
+            <Link href="/matches" className="font-brand text-xl text-ink">
               Aura
             </Link>
             <button

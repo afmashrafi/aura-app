@@ -95,7 +95,7 @@ export default function QuestionnairePage() {
     try {
       await completeQuestionnaire(user.id);
       await refreshProfile();
-      router.push("/matches");
+      router.push("/profile-setup");
     } finally {
       setCompleting(false);
     }
