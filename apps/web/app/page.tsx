@@ -3,87 +3,154 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 
+const PILLS = [
+  { text: "INTJ",          rotate: "-6deg",  delay: 0,    x: "8%",   y: "12%" },
+  { text: "bookworm",      rotate: "5deg",   delay: 0.1,  x: "72%",  y: "8%"  },
+  { text: "anime fan",     rotate: "-4deg",  delay: 0.15, x: "80%",  y: "28%" },
+  { text: "night owl",     rotate: "7deg",   delay: 0.2,  x: "5%",   y: "38%" },
+  { text: "music lover",   rotate: "-8deg",  delay: 0.05, x: "62%",  y: "55%" },
+  { text: "film buff",     rotate: "4deg",   delay: 0.25, x: "10%",  y: "62%" },
+  { text: "deep thinker",  rotate: "-5deg",  delay: 0.3,  x: "74%",  y: "72%" },
+  { text: "coffee addict", rotate: "6deg",   delay: 0.1,  x: "15%",  y: "80%" },
+  { text: "ENFP",          rotate: "-3deg",  delay: 0.35, x: "55%",  y: "85%" },
+  { text: "poet",          rotate: "8deg",   delay: 0.2,  x: "82%",  y: "88%" },
+];
+
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen bg-white flex flex-col items-center justify-center overflow-hidden px-6">
-      {/* Floating blobs */}
-      <div
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-        aria-hidden="true"
-      >
-        <div className="absolute w-[500px] h-[500px] rounded-full bg-primary-light opacity-[0.06] -top-32 -left-32 animate-blob" />
-        <div className="absolute w-[400px] h-[400px] rounded-full bg-primary opacity-[0.05] top-1/2 -right-24 animate-blob-delay" />
-        <div className="absolute w-[300px] h-[300px] rounded-full bg-primary-light opacity-[0.06] -bottom-24 left-1/3 animate-blob-slow" />
+    <div className="relative min-h-screen overflow-hidden flex flex-col items-center justify-center"
+      style={{ background: "linear-gradient(145deg, #2D1B69 0%, #4C1D95 35%, #6D28D9 70%, #7C3AED 100%)" }}
+    >
+      {/* Soft glow orbs */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div className="absolute w-[600px] h-[600px] rounded-full opacity-20 -top-48 -left-48"
+          style={{ background: "radial-gradient(circle, #A78BFA, transparent 70%)" }} />
+        <div className="absolute w-[500px] h-[500px] rounded-full opacity-15 -bottom-32 -right-32"
+          style={{ background: "radial-gradient(circle, #C4B5FD, transparent 70%)" }} />
+        <div className="absolute w-[300px] h-[300px] rounded-full opacity-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{ background: "radial-gradient(circle, #DDD6FE, transparent 70%)" }} />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-        className="relative z-10 flex flex-col items-center text-center max-w-sm w-full"
-      >
-        {/* Logo mark */}
+      {/* Floating personality pills */}
+      {PILLS.map((pill, i) => (
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          key={pill.text}
+          initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-          className="mb-8 flex items-center justify-center w-16 h-16 rounded-[20px] bg-primary-pale"
+          transition={{ delay: 0.6 + pill.delay, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+          className="absolute hidden sm:block pointer-events-none select-none"
+          style={{ left: pill.x, top: pill.y }}
         >
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <circle cx="11" cy="16" r="9" fill="#7C3AED" opacity="0.6" />
-            <circle cx="21" cy="16" r="9" fill="#A78BFA" opacity="0.6" />
-          </svg>
+          <motion.span
+            animate={{ y: [0, i % 2 === 0 ? -8 : 8, 0] }}
+            transition={{ duration: 4 + i * 0.3, repeat: Infinity, ease: "easeInOut", delay: i * 0.4 }}
+            className="inline-block px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm border"
+            style={{
+              rotate: pill.rotate,
+              background: "rgba(255,255,255,0.12)",
+              borderColor: "rgba(255,255,255,0.2)",
+              color: "rgba(255,255,255,0.85)",
+            }}
+          >
+            {pill.text}
+          </motion.span>
+        </motion.div>
+      ))}
+
+      {/* Main content */}
+      <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-md w-full">
+        {/* Logo */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+          className="mb-8"
+        >
+          <div className="w-20 h-20 mx-auto rounded-[28px] flex items-center justify-center mb-0"
+            style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.25)" }}
+          >
+            <svg width="42" height="42" viewBox="0 0 32 32" fill="none">
+              <circle cx="11" cy="16" r="9" fill="white" opacity="0.7" />
+              <circle cx="21" cy="16" r="9" fill="white" opacity="0.45" />
+            </svg>
+          </div>
         </motion.div>
 
-        {/* Heading */}
+        {/* Brand name */}
         <motion.h1
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.4 }}
-          className="font-brand text-[42px] leading-tight text-ink mb-3"
+          transition={{ delay: 0.15, duration: 0.5 }}
+          className="font-brand text-[72px] leading-none text-white mb-4 tracking-tight"
         >
           Aura
         </motion.h1>
 
+        {/* Tagline */}
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.22, duration: 0.4 }}
-          className="text-lg text-ink-secondary mb-10 leading-relaxed"
+          transition={{ delay: 0.25, duration: 0.5 }}
+          className="text-[22px] font-display font-medium leading-snug mb-3"
+          style={{ color: "rgba(255,255,255,0.9)" }}
         >
-          Meet someone who actually gets you.
+          Connect beyond the surface.
         </motion.p>
 
-        {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
+          transition={{ delay: 0.32, duration: 0.5 }}
+          className="text-base leading-relaxed mb-10"
+          style={{ color: "rgba(255,255,255,0.6)" }}
+        >
+          No photos. No swiping. Just real compatibility<br />based on who you actually are.
+        </motion.p>
+
+        {/* CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.42, duration: 0.5 }}
           className="flex flex-col gap-3 w-full"
         >
           <Link
             href="/sign-up"
-            className="inline-flex h-13 items-center justify-center rounded-[14px] bg-primary text-white font-medium text-base transition-all duration-150 active:scale-[0.97] hover:bg-[#6D28D9] shadow-[0_2px_16px_rgba(124,58,237,0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+            className="h-14 flex items-center justify-center rounded-2xl font-semibold text-base transition-all duration-200 active:scale-[0.97] hover:opacity-95"
+            style={{ background: "white", color: "#5B21B6" }}
           >
-            Create account
+            Create your account
           </Link>
           <Link
             href="/sign-in"
-            className="inline-flex h-13 items-center justify-center rounded-[14px] bg-transparent text-primary border border-primary font-medium text-base transition-all duration-150 active:scale-[0.97] hover:bg-primary-pale focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+            className="h-14 flex items-center justify-center rounded-2xl font-semibold text-base transition-all duration-200 active:scale-[0.97]"
+            style={{
+              background: "rgba(255,255,255,0.12)",
+              color: "white",
+              border: "1.5px solid rgba(255,255,255,0.3)",
+              backdropFilter: "blur(8px)",
+            }}
           >
             Sign in
           </Link>
         </motion.div>
 
-        <motion.p
+        {/* Trust line */}
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.4 }}
-          className="mt-8 text-sm text-ink-muted"
+          transition={{ delay: 0.65, duration: 0.5 }}
+          className="mt-10 flex items-center gap-6"
+          style={{ color: "rgba(255,255,255,0.4)" }}
         >
-          No photos. No swiping. Just real compatibility.
-        </motion.p>
-      </motion.div>
+          {["Personality-first", "Privacy-focused", "No photos"].map((tag, i) => (
+            <span key={tag} className="flex items-center gap-2 text-xs font-medium">
+              {i !== 0 && <span className="w-1 h-1 rounded-full bg-white/30" />}
+              {tag}
+            </span>
+          ))}
+        </motion.div>
+      </div>
     </div>
   );
 }
