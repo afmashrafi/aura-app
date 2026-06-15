@@ -77,10 +77,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isQuestionnaire = pathname === "/questionnaire";
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col" style={{ background: "linear-gradient(160deg, #E6E6FF 0%, #F3F3FF 60%, #FFFFFF 100%)" }}>
       {/* Top bar (hidden during questionnaire) */}
       {!isQuestionnaire && (
-        <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-divider">
+        <header className="sticky top-0 z-40 border-b border-divider" style={{ background: "rgba(255,255,255,0.65)", backdropFilter: "blur(40px) saturate(200%)", WebkitBackdropFilter: "blur(40px) saturate(200%)", boxShadow: "inset 0 -1px 0 rgba(224,224,255,0.8), 0 1px 24px rgba(128,128,255,0.06)" }}>
           <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
             <Link href="/matches" className="font-brand text-xl text-ink">
               Aura
@@ -103,7 +103,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Bottom nav (hidden during questionnaire) */}
       {!isQuestionnaire && (
-        <nav className="sticky bottom-0 z-40 bg-white/90 backdrop-blur-md border-t border-divider">
+        <nav className="sticky bottom-0 z-40 border-t border-divider" style={{ background: "rgba(255,255,255,0.70)", backdropFilter: "blur(40px) saturate(200%)", WebkitBackdropFilter: "blur(40px) saturate(200%)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.95), 0 -1px 24px rgba(128,128,255,0.06)" }}>
           <div className="max-w-lg mx-auto px-8 h-16 flex items-center justify-around">
             <NavIcon
               href="/matches"

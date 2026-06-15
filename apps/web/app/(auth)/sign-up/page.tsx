@@ -117,14 +117,8 @@ export default function SignUpPage() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4 + i * 0.1, duration: 0.4 }}
-            className="absolute hidden sm:inline-block text-xs font-semibold px-3 py-1.5 rounded-full"
-            style={{
-              left: p.x, top: p.y, rotate: p.r,
-              background: "rgba(255,255,255,0.7)",
-              border: "1.5px solid rgba(255,255,255,0.9)",
-              color: "#5B5B8A",
-              backdropFilter: "blur(8px)",
-            }}
+            className="glass-float absolute hidden sm:inline-block text-xs font-semibold px-3 py-1.5 rounded-full"
+            style={{ left: p.x, top: p.y, rotate: p.r, color: "#5B5B8A" }}
           >
             {p.text}
           </motion.span>
@@ -139,12 +133,7 @@ export default function SignUpPage() {
         >
           <Link href="/">
             <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto"
-              style={{
-                background: "rgba(255,255,255,0.75)",
-                border: "1.5px solid rgba(255,255,255,0.9)",
-                boxShadow: "0 4px 20px rgba(128,128,255,0.15)",
-              }}
+              className="glass w-14 h-14 rounded-2xl flex items-center justify-center mx-auto"
             >
               <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
                 <circle cx="11" cy="16" r="9" fill="#8080FF" opacity="0.7" />
@@ -201,8 +190,14 @@ export default function SignUpPage() {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.22, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-        className="flex-1 bg-white rounded-t-[32px] px-6 pt-8 pb-10 overflow-y-auto"
-        style={{ boxShadow: "0 -8px 40px rgba(128,128,255,0.12)" }}
+        className="flex-1 rounded-t-[32px] px-6 pt-8 pb-10 overflow-y-auto"
+        style={{
+          background: "rgba(255,255,255,0.75)",
+          backdropFilter: "blur(40px) saturate(200%)",
+          WebkitBackdropFilter: "blur(40px) saturate(200%)",
+          borderTop: "1.5px solid rgba(255,255,255,0.9)",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.95), 0 -8px 40px rgba(128,128,255,0.10)",
+        }}
       >
         <div className="max-w-sm mx-auto">
           <AnimatePresence mode="wait">

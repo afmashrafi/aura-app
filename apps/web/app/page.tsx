@@ -43,15 +43,8 @@ export default function LandingPage() {
           <motion.span
             animate={{ y: [0, i % 2 === 0 ? -7 : 7, 0] }}
             transition={{ duration: 4 + i * 0.3, repeat: Infinity, ease: "easeInOut", delay: i * 0.4 }}
-            className="inline-block px-4 py-2 rounded-full text-sm font-semibold"
-            style={{
-              rotate: pill.rotate,
-              background: "rgba(255,255,255,0.7)",
-              border: "1.5px solid rgba(255,255,255,0.9)",
-              color: "#5B5B8A",
-              backdropFilter: "blur(8px)",
-              boxShadow: "0 2px 12px rgba(128,128,255,0.12)",
-            }}
+            className="glass-float inline-block px-4 py-2 rounded-full text-sm font-semibold"
+            style={{ rotate: pill.rotate, color: "#5B5B8A" }}
           >
             {pill.text}
           </motion.span>
@@ -68,13 +61,7 @@ export default function LandingPage() {
           className="mb-7"
         >
           <div
-            className="w-20 h-20 mx-auto rounded-[28px] flex items-center justify-center"
-            style={{
-              background: "rgba(255,255,255,0.75)",
-              backdropFilter: "blur(12px)",
-              border: "1.5px solid rgba(255,255,255,0.9)",
-              boxShadow: "0 4px 24px rgba(128,128,255,0.15)",
-            }}
+            className="glass w-20 h-20 mx-auto rounded-[28px] flex items-center justify-center"
           >
             <svg width="42" height="42" viewBox="0 0 32 32" fill="none">
               <circle cx="11" cy="16" r="9" fill="#8080FF" opacity="0.7" />
@@ -124,24 +111,14 @@ export default function LandingPage() {
         >
           <Link
             href="/sign-up"
-            className="h-14 flex items-center justify-center rounded-2xl font-semibold text-base transition-all duration-200 active:scale-[0.97]"
-            style={{
-              background: "#8080FF",
-              color: "white",
-              boxShadow: "0 4px 20px rgba(128,128,255,0.35)",
-            }}
+            className="btn-glass-primary h-14 flex items-center justify-center rounded-2xl font-semibold text-base text-white"
           >
             Create your account
           </Link>
           <Link
             href="/sign-in"
-            className="h-14 flex items-center justify-center rounded-2xl font-semibold text-base transition-all duration-200 active:scale-[0.97]"
-            style={{
-              background: "rgba(255,255,255,0.65)",
-              color: "#5B5B8A",
-              border: "1.5px solid rgba(255,255,255,0.9)",
-              backdropFilter: "blur(8px)",
-            }}
+            className="btn-glass-ghost h-14 flex items-center justify-center rounded-2xl font-semibold text-base"
+            style={{ color: "#3D3A7A" }}
           >
             Sign in
           </Link>

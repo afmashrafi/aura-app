@@ -60,6 +60,116 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ─── Liquid Glass (macOS Tahoe style) ─── */
+
+/* Base glass surface — panels, cards */
+.glass {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(128, 128, 255, 0.06),
+    0 8px 32px rgba(128, 128, 255, 0.10);
+}
+
+/* Lighter float glass — pills, badges */
+.glass-float {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1.5px solid rgba(255, 255, 255, 0.78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 4px 16px rgba(128, 128, 255, 0.08);
+}
+
+/* Primary button — glass over periwinkle */
+.btn-glass-primary {
+  position: relative;
+  background: #8080FF;
+  color: white;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.28),
+    0 4px 20px rgba(128, 128, 255, 0.38);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  overflow: hidden;
+}
+.btn-glass-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.14) 0%, transparent 60%);
+  pointer-events: none;
+}
+.btn-glass-primary:hover:not(:disabled) {
+  background: #9090FF;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.32),
+    0 8px 32px rgba(128, 128, 255, 0.55);
+  transform: scale(1.02) translateY(-1px);
+}
+.btn-glass-primary:active:not(:disabled) {
+  transform: scale(0.97) translateY(0);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 2px 10px rgba(128, 128, 255, 0.3);
+}
+
+/* Ghost / glass button */
+.btn-glass-ghost {
+  position: relative;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1.5px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.8),
+    0 4px 16px rgba(128, 128, 255, 0.08);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  overflow: hidden;
+}
+.btn-glass-ghost::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 55%);
+  pointer-events: none;
+}
+.btn-glass-ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+    0 8px 28px rgba(128, 128, 255, 0.16);
+  transform: scale(1.02) translateY(-1px);
+}
+.btn-glass-ghost:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Secondary / surface button */
+.btn-glass-secondary {
+  position: relative;
+  background: rgba(243, 243, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(224, 224, 255, 0.9);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px rgba(128, 128, 255, 0.06);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+.btn-glass-secondary:hover:not(:disabled) {
+  background: rgba(230, 230, 255, 0.8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 4px 16px rgba(128, 128, 255, 0.12);
+  transform: scale(1.01) translateY(-0.5px);
+}
+.btn-glass-secondary:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* ─── end glass ─── */
+
 /* Hide scrollbar but keep scrollable */
 .scrollbar-hide {
   scrollbar-width: none;
