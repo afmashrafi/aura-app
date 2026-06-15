@@ -4,31 +4,30 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 
 const PILLS = [
-  { text: "INTJ",          rotate: "-6deg",  delay: 0,    x: "8%",   y: "12%" },
-  { text: "bookworm",      rotate: "5deg",   delay: 0.1,  x: "72%",  y: "8%"  },
-  { text: "anime fan",     rotate: "-4deg",  delay: 0.15, x: "80%",  y: "28%" },
-  { text: "night owl",     rotate: "7deg",   delay: 0.2,  x: "5%",   y: "38%" },
-  { text: "music lover",   rotate: "-8deg",  delay: 0.05, x: "62%",  y: "55%" },
-  { text: "film buff",     rotate: "4deg",   delay: 0.25, x: "10%",  y: "62%" },
-  { text: "deep thinker",  rotate: "-5deg",  delay: 0.3,  x: "74%",  y: "72%" },
-  { text: "coffee addict", rotate: "6deg",   delay: 0.1,  x: "15%",  y: "80%" },
-  { text: "ENFP",          rotate: "-3deg",  delay: 0.35, x: "55%",  y: "85%" },
-  { text: "poet",          rotate: "8deg",   delay: 0.2,  x: "82%",  y: "88%" },
+  { text: "INTJ",          rotate: "-6deg",  delay: 0,    x: "6%",   y: "10%" },
+  { text: "bookworm",      rotate: "5deg",   delay: 0.1,  x: "70%",  y: "7%"  },
+  { text: "anime fan",     rotate: "-4deg",  delay: 0.15, x: "78%",  y: "26%" },
+  { text: "night owl",     rotate: "7deg",   delay: 0.2,  x: "4%",   y: "36%" },
+  { text: "music lover",   rotate: "-8deg",  delay: 0.05, x: "60%",  y: "54%" },
+  { text: "film buff",     rotate: "4deg",   delay: 0.25, x: "8%",   y: "60%" },
+  { text: "deep thinker",  rotate: "-5deg",  delay: 0.3,  x: "72%",  y: "70%" },
+  { text: "coffee addict", rotate: "6deg",   delay: 0.1,  x: "12%",  y: "78%" },
+  { text: "ENFP",          rotate: "-3deg",  delay: 0.35, x: "54%",  y: "84%" },
+  { text: "poet",          rotate: "8deg",   delay: 0.2,  x: "80%",  y: "88%" },
 ];
 
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden flex flex-col items-center justify-center"
-      style={{ background: "linear-gradient(145deg, #2D1B69 0%, #4C1D95 35%, #6D28D9 70%, #7C3AED 100%)" }}
+    <div
+      className="relative min-h-screen overflow-hidden flex flex-col items-center justify-center"
+      style={{ background: "linear-gradient(160deg, #ABABFF 0%, #BFBFFF 30%, #D3D3FF 60%, #F3F3FF 100%)" }}
     >
-      {/* Soft glow orbs */}
+      {/* Soft radial glows */}
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="absolute w-[600px] h-[600px] rounded-full opacity-20 -top-48 -left-48"
-          style={{ background: "radial-gradient(circle, #A78BFA, transparent 70%)" }} />
-        <div className="absolute w-[500px] h-[500px] rounded-full opacity-15 -bottom-32 -right-32"
-          style={{ background: "radial-gradient(circle, #C4B5FD, transparent 70%)" }} />
-        <div className="absolute w-[300px] h-[300px] rounded-full opacity-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-          style={{ background: "radial-gradient(circle, #DDD6FE, transparent 70%)" }} />
+        <div className="absolute w-[560px] h-[560px] rounded-full -top-40 -left-40 opacity-40"
+          style={{ background: "radial-gradient(circle, #FFFFFF, transparent 65%)" }} />
+        <div className="absolute w-[400px] h-[400px] rounded-full -bottom-24 -right-24 opacity-30"
+          style={{ background: "radial-gradient(circle, #E6E6FF, transparent 65%)" }} />
       </div>
 
       {/* Floating personality pills */}
@@ -42,14 +41,16 @@ export default function LandingPage() {
           style={{ left: pill.x, top: pill.y }}
         >
           <motion.span
-            animate={{ y: [0, i % 2 === 0 ? -8 : 8, 0] }}
+            animate={{ y: [0, i % 2 === 0 ? -7 : 7, 0] }}
             transition={{ duration: 4 + i * 0.3, repeat: Infinity, ease: "easeInOut", delay: i * 0.4 }}
-            className="inline-block px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm border"
+            className="inline-block px-4 py-2 rounded-full text-sm font-semibold"
             style={{
               rotate: pill.rotate,
-              background: "rgba(255,255,255,0.12)",
-              borderColor: "rgba(255,255,255,0.2)",
-              color: "rgba(255,255,255,0.85)",
+              background: "rgba(255,255,255,0.7)",
+              border: "1.5px solid rgba(255,255,255,0.9)",
+              color: "#5B5B8A",
+              backdropFilter: "blur(8px)",
+              boxShadow: "0 2px 12px rgba(128,128,255,0.12)",
             }}
           >
             {pill.text}
@@ -64,14 +65,20 @@ export default function LandingPage() {
           initial={{ opacity: 0, scale: 0.7 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
-          className="mb-8"
+          className="mb-7"
         >
-          <div className="w-20 h-20 mx-auto rounded-[28px] flex items-center justify-center mb-0"
-            style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.25)" }}
+          <div
+            className="w-20 h-20 mx-auto rounded-[28px] flex items-center justify-center"
+            style={{
+              background: "rgba(255,255,255,0.75)",
+              backdropFilter: "blur(12px)",
+              border: "1.5px solid rgba(255,255,255,0.9)",
+              boxShadow: "0 4px 24px rgba(128,128,255,0.15)",
+            }}
           >
             <svg width="42" height="42" viewBox="0 0 32 32" fill="none">
-              <circle cx="11" cy="16" r="9" fill="white" opacity="0.7" />
-              <circle cx="21" cy="16" r="9" fill="white" opacity="0.45" />
+              <circle cx="11" cy="16" r="9" fill="#8080FF" opacity="0.7" />
+              <circle cx="21" cy="16" r="9" fill="#ABABFF" opacity="0.65" />
             </svg>
           </div>
         </motion.div>
@@ -81,7 +88,8 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.5 }}
-          className="font-brand text-[72px] leading-none text-white mb-4 tracking-tight"
+          className="font-brand text-[76px] leading-none mb-4 tracking-tight"
+          style={{ color: "#1E1B4B" }}
         >
           Aura
         </motion.h1>
@@ -91,8 +99,8 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.5 }}
-          className="text-[22px] font-display font-medium leading-snug mb-3"
-          style={{ color: "rgba(255,255,255,0.9)" }}
+          className="text-[22px] font-display font-semibold leading-snug mb-3"
+          style={{ color: "#3D3A7A" }}
         >
           Connect beyond the surface.
         </motion.p>
@@ -102,7 +110,7 @@ export default function LandingPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.32, duration: 0.5 }}
           className="text-base leading-relaxed mb-10"
-          style={{ color: "rgba(255,255,255,0.6)" }}
+          style={{ color: "#7070AA" }}
         >
           No photos. No swiping. Just real compatibility<br />based on who you actually are.
         </motion.p>
@@ -116,8 +124,12 @@ export default function LandingPage() {
         >
           <Link
             href="/sign-up"
-            className="h-14 flex items-center justify-center rounded-2xl font-semibold text-base transition-all duration-200 active:scale-[0.97] hover:opacity-95"
-            style={{ background: "white", color: "#5B21B6" }}
+            className="h-14 flex items-center justify-center rounded-2xl font-semibold text-base transition-all duration-200 active:scale-[0.97]"
+            style={{
+              background: "#8080FF",
+              color: "white",
+              boxShadow: "0 4px 20px rgba(128,128,255,0.35)",
+            }}
           >
             Create your account
           </Link>
@@ -125,9 +137,9 @@ export default function LandingPage() {
             href="/sign-in"
             className="h-14 flex items-center justify-center rounded-2xl font-semibold text-base transition-all duration-200 active:scale-[0.97]"
             style={{
-              background: "rgba(255,255,255,0.12)",
-              color: "white",
-              border: "1.5px solid rgba(255,255,255,0.3)",
+              background: "rgba(255,255,255,0.65)",
+              color: "#5B5B8A",
+              border: "1.5px solid rgba(255,255,255,0.9)",
               backdropFilter: "blur(8px)",
             }}
           >
@@ -135,17 +147,16 @@ export default function LandingPage() {
           </Link>
         </motion.div>
 
-        {/* Trust line */}
+        {/* Trust tagline */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.65, duration: 0.5 }}
-          className="mt-10 flex items-center gap-6"
-          style={{ color: "rgba(255,255,255,0.4)" }}
+          className="mt-10 flex items-center gap-5"
         >
           {["Personality-first", "Privacy-focused", "No photos"].map((tag, i) => (
-            <span key={tag} className="flex items-center gap-2 text-xs font-medium">
-              {i !== 0 && <span className="w-1 h-1 rounded-full bg-white/30" />}
+            <span key={tag} className="flex items-center gap-2 text-xs font-medium" style={{ color: "#9090BB" }}>
+              {i !== 0 && <span className="w-1 h-1 rounded-full" style={{ background: "#BFBFFF" }} />}
               {tag}
             </span>
           ))}

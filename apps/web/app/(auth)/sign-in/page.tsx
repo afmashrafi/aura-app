@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/Input";
 import { useAuth } from "@/app/providers";
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 14 },
   visible: (i: number) => ({
     opacity: 1, y: 0,
     transition: { delay: i * 0.07, duration: 0.4, ease: [0.4, 0, 0.2, 1] },
@@ -51,42 +51,45 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col"
-      style={{ background: "linear-gradient(160deg, #2D1B69 0%, #4C1D95 40%, #6D28D9 100%)" }}
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ background: "linear-gradient(160deg, #ABABFF 0%, #BFBFFF 35%, #D3D3FF 100%)" }}
     >
       {/* Hero header */}
       <div className="relative flex flex-col items-center justify-center pt-16 pb-10 px-6 overflow-hidden">
-        {/* Glow */}
+        {/* White glow */}
         <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div className="absolute w-80 h-80 rounded-full opacity-20 -top-20 -left-20"
-            style={{ background: "radial-gradient(circle, #A78BFA, transparent 70%)" }} />
-          <div className="absolute w-60 h-60 rounded-full opacity-15 top-0 right-0"
-            style={{ background: "radial-gradient(circle, #C4B5FD, transparent 70%)" }} />
+          <div className="absolute w-72 h-72 rounded-full opacity-50 -top-16 -left-16"
+            style={{ background: "radial-gradient(circle, #FFFFFF, transparent 65%)" }} />
+          <div className="absolute w-56 h-56 rounded-full opacity-35 -top-8 right-0"
+            style={{ background: "radial-gradient(circle, #F3F3FF, transparent 65%)" }} />
         </div>
 
         {/* Floating pills */}
         {[
-          { text: "INFJ", x: "8%",  y: "20%", r: "-8deg" },
-          { text: "reader", x: "70%", y: "15%", r: "6deg" },
-          { text: "poet",   x: "78%", y: "60%", r: "-5deg" },
+          { text: "INFJ",   x: "6%",  y: "18%", r: "-8deg" },
+          { text: "reader", x: "68%", y: "14%", r: "6deg"  },
+          { text: "poet",   x: "76%", y: "60%", r: "-5deg" },
         ].map((p, i) => (
           <motion.span
             key={p.text}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4 + i * 0.1, duration: 0.4 }}
-            className="absolute hidden sm:inline-block text-xs font-medium px-3 py-1.5 rounded-full"
+            className="absolute hidden sm:inline-block text-xs font-semibold px-3 py-1.5 rounded-full"
             style={{
               left: p.x, top: p.y, rotate: p.r,
-              background: "rgba(255,255,255,0.12)",
-              border: "1px solid rgba(255,255,255,0.2)",
-              color: "rgba(255,255,255,0.8)",
+              background: "rgba(255,255,255,0.7)",
+              border: "1.5px solid rgba(255,255,255,0.9)",
+              color: "#5B5B8A",
+              backdropFilter: "blur(8px)",
             }}
           >
             {p.text}
           </motion.span>
         ))}
 
+        {/* Logo */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -94,12 +97,17 @@ export default function SignInPage() {
           className="relative z-10 mb-5"
         >
           <Link href="/">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
-              style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)" }}
+            <div
+              className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
+              style={{
+                background: "rgba(255,255,255,0.75)",
+                border: "1.5px solid rgba(255,255,255,0.9)",
+                boxShadow: "0 4px 20px rgba(128,128,255,0.15)",
+              }}
             >
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <circle cx="11" cy="16" r="9" fill="white" opacity="0.75" />
-                <circle cx="21" cy="16" r="9" fill="white" opacity="0.45" />
+                <circle cx="11" cy="16" r="9" fill="#8080FF" opacity="0.7" />
+                <circle cx="21" cy="16" r="9" fill="#ABABFF" opacity="0.65" />
               </svg>
             </div>
           </Link>
@@ -109,7 +117,8 @@ export default function SignInPage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.4 }}
-          className="relative z-10 font-display text-[32px] font-bold text-white leading-tight text-center mb-2"
+          className="relative z-10 font-display text-[32px] font-bold leading-tight text-center mb-2"
+          style={{ color: "#1E1B4B" }}
         >
           Welcome back
         </motion.h1>
@@ -118,10 +127,10 @@ export default function SignInPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.18, duration: 0.4 }}
           className="relative z-10 text-sm text-center"
-          style={{ color: "rgba(255,255,255,0.6)" }}
+          style={{ color: "#5B5B8A" }}
         >
           Don&apos;t have an account?{" "}
-          <Link href="/sign-up" className="font-semibold underline underline-offset-2" style={{ color: "rgba(255,255,255,0.9)" }}>
+          <Link href="/sign-up" className="font-semibold underline underline-offset-2" style={{ color: "#3D3A7A" }}>
             Sign up
           </Link>
         </motion.p>
@@ -133,7 +142,7 @@ export default function SignInPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.22, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
         className="flex-1 bg-white rounded-t-[32px] px-6 pt-8 pb-10"
-        style={{ boxShadow: "0 -8px 40px rgba(0,0,0,0.15)" }}
+        style={{ boxShadow: "0 -8px 40px rgba(128,128,255,0.12)" }}
       >
         <div className="max-w-sm mx-auto">
           <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
@@ -184,9 +193,9 @@ export default function SignInPage() {
             variants={fadeUp} initial="hidden" animate="visible" custom={3}
             className="flex items-center gap-3 my-6"
           >
-            <div className="flex-1 h-px bg-divider" />
-            <span className="text-xs text-ink-muted font-medium">OR</span>
-            <div className="flex-1 h-px bg-divider" />
+            <div className="flex-1 h-px" style={{ background: "#E6E6FF" }} />
+            <span className="text-xs font-medium" style={{ color: "#9090BB" }}>OR</span>
+            <div className="flex-1 h-px" style={{ background: "#E6E6FF" }} />
           </motion.div>
 
           {/* Features list */}
@@ -195,13 +204,17 @@ export default function SignInPage() {
             className="flex flex-col gap-3"
           >
             {[
-              { icon: "✦", text: "Matched by personality, not photos" },
-              { icon: "✦", text: "Real-time chat with your matches" },
-              { icon: "✦", text: "Your data stays private" },
-            ].map((f) => (
-              <div key={f.text} className="flex items-center gap-3">
-                <span className="text-primary text-xs">{f.icon}</span>
-                <span className="text-sm text-ink-secondary">{f.text}</span>
+              "Matched by personality, not photos",
+              "Real-time chat with your matches",
+              "Your data stays private",
+            ].map((text) => (
+              <div key={text} className="flex items-center gap-3">
+                <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0" style={{ background: "#E6E6FF" }}>
+                  <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none">
+                    <path d="M2.5 6l2.5 2.5 4.5-5" stroke="#8080FF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <span className="text-sm" style={{ color: "#5B5B8A" }}>{text}</span>
               </div>
             ))}
           </motion.div>
