@@ -8,6 +8,33 @@ export interface FavoriteCategory {
   items: string[];
 }
 
+export type HairStyle = 'short' | 'long' | 'curly' | 'bun' | 'wavy' | 'braids' | 'bob' | 'fade';
+export type EyeStyle = 'round' | 'almond' | 'wide' | 'sleepy';
+export type OutfitStyle = 'tshirt' | 'hoodie' | 'blazer' | 'sweater' | 'tank';
+export type Accessory = 'none' | 'glasses' | 'sunglasses' | 'cap' | 'beanie';
+
+export interface AvatarConfig {
+  skinTone: string;
+  hairStyle: HairStyle;
+  hairColor: string;
+  eyeStyle: EyeStyle;
+  outfitStyle: OutfitStyle;
+  outfitColor: string;
+  accessory: Accessory;
+  bgColor: string;
+}
+
+export const DEFAULT_AVATAR: AvatarConfig = {
+  skinTone: '#FFDBB4',
+  hairStyle: 'short',
+  hairColor: '#4A3000',
+  eyeStyle: 'round',
+  outfitStyle: 'tshirt',
+  outfitColor: '#8080FF',
+  accessory: 'none',
+  bgColor: '#E6E6FF',
+};
+
 export interface Profile {
   id: string;
   first_name: string;
@@ -20,6 +47,8 @@ export interface Profile {
   prompt_responses: PromptResponse[];
   social_links: SocialLink[];
   favorites: FavoriteCategory[];
+  avatar_config: AvatarConfig | null;
+  avatar_url: string | null;
   created_at: string;
 }
 

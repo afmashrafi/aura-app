@@ -5,7 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { CompatibilityBadge } from "./CompatibilityBadge";
+import { Avatar3D } from "@/components/avatar/Avatar3D";
 import type { MatchWithPartner } from "@aura/api";
+import type { AvatarConfig } from "@aura/types";
 
 const CATEGORY_META: Record<string, { label: string; emoji: string }> = {
   music:     { label: "Music",     emoji: "🎵" },
@@ -24,6 +26,8 @@ interface MatchCardProps {
   matchWithPartner: MatchWithPartner;
   currentUserId: string;
   onConnect: () => void;
+  myAvatarConfig?: AvatarConfig | null;
+  myAvatarUrl?: string | null;
 }
 
 function InitialsAvatar({ name, size = "lg" }: { name: string; size?: "sm" | "lg" }) {
@@ -39,9 +43,10 @@ function InitialsAvatar({ name, size = "lg" }: { name: string; size?: "sm" | "lg
   );
 }
 
-export function MatchCard({ matchWithPartner, currentUserId, onConnect }: MatchCardProps) {
+export function MatchCard({ matchWithPartner, currentUserId, onConnect, myAvatarConfig, myAvatarUrl }: MatchCardProps) {
   const { match, partner } = matchWithPartner;
   const [expanded, setExpanded] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   const hasExtra =
     partner.bio ||
@@ -54,17 +59,33 @@ export function MatchCard({ matchWithPartner, currentUserId, onConnect }: MatchC
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
     >
       <Card className="overflow-hidden">
         {/* Header */}
         <div className="p-5">
           <div className="flex items-center gap-4 mb-4">
-            <div className="relative flex shrink-0">
-              <InitialsAvatar name="Me" size="sm" />
-              <div className="-ml-3">
-                <InitialsAvatar name={partner.first_name} size="sm" />
+            {/* Duo avatar display */}
+            <div className="relative flex shrink-0 items-end">
+              <Avatar3D
+                avatarUrl={myAvatarUrl}
+                avatarConfig={myAvatarConfig}
+                name="Me"
+                size={44}
+                animate={!hovered}
+              />
+              <div className="-ml-3 ring-2 ring-white rounded-full">
+                <Avatar3D
+                  avatarUrl={partner.avatar_url}
+                  avatarConfig={partner.avatar_config}
+                  name={partner.first_name}
+                  size={44}
+                  animate
+                />
               </div>
             </div>
+
             <div className="flex flex-col gap-1 min-w-0">
               <p className="font-semibold text-ink text-base leading-tight">
                 {partner.first_name}
@@ -120,6 +141,20 @@ export function MatchCard({ matchWithPartner, currentUserId, onConnect }: MatchC
               className="overflow-hidden"
             >
               <div className="border-t border-divider px-5 py-4 flex flex-col gap-5">
+
+                {/* Partner avatar showcase */}
+                {(partner.avatar_url || partner.avatar_config) && (
+                  <div className="flex flex-col items-center gap-2 pb-2">
+                    <Avatar3D
+                      avatarUrl={partner.avatar_url}
+                      avatarConfig={partner.avatar_config}
+                      name={partner.first_name}
+                      size={96}
+                      animate
+                    />
+                    <p className="text-xs text-ink-muted">{partner.first_name}'s avatar</p>
+                  </div>
+                )}
 
                 {/* Bio */}
                 {partner.bio && (

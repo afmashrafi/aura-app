@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { PromptResponse, SocialLink, FavoriteCategory } from '@aura/types';
+import type { PromptResponse, SocialLink, FavoriteCategory, AvatarConfig } from '@aura/types';
 
 export async function updateBio(userId: string, bio: string) {
   const { error } = await supabase
@@ -21,6 +21,22 @@ export async function updatePromptResponses(userId: string, prompt_responses: Pr
   const { error } = await supabase
     .from('profiles')
     .update({ prompt_responses })
+    .eq('id', userId);
+  if (error) throw error;
+}
+
+export async function updateAvatar(userId: string, avatar_config: AvatarConfig) {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ avatar_config })
+    .eq('id', userId);
+  if (error) throw error;
+}
+
+export async function updateAvatarUrl(userId: string, avatar_url: string) {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ avatar_url })
     .eq('id', userId);
   if (error) throw error;
 }

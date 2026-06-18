@@ -3,19 +3,22 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { updateProfileSetup, supabase } from "@aura/api";
-import type { PromptResponse, FavoriteCategory } from "@aura/types";
+import { updateProfileSetup, updateAvatar, supabase } from "@aura/api";
+import type { PromptResponse, FavoriteCategory, AvatarConfig } from "@aura/types";
+import { DEFAULT_AVATAR } from "@aura/types";
 import { useAuth } from "@/app/providers";
 import { Button } from "@/components/ui/Button";
 import { InterestsPicker } from "@/components/profile/InterestsPicker";
 import { PromptsPicker } from "@/components/profile/PromptsPicker";
 import { FavoritesPicker } from "@/components/profile/FavoritesPicker";
+import { AvatarBuilder } from "@/components/avatar/AvatarBuilder";
 
 const STEPS = [
   { label: "About you",  emoji: "✍️" },
   { label: "Interests",  emoji: "✨" },
   { label: "Prompts",    emoji: "💬" },
   { label: "Favourites", emoji: "❤️" },
+  { label: "Your avatar", emoji: "🎭" },
 ] as const;
 
 export default function ProfileSetupPage() {
@@ -27,6 +30,7 @@ export default function ProfileSetupPage() {
   const [interests, setInterests] = useState<string[]>([]);
   const [promptResponses, setPromptResponses] = useState<PromptResponse[]>([]);
   const [favorites, setFavorites] = useState<FavoriteCategory[]>([]);
+  const [avatarConfig, setAvatarConfig] = useState<AvatarConfig>(DEFAULT_AVATAR);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
@@ -45,9 +49,9 @@ export default function ProfileSetupPage() {
         prompt_responses: filledResponses,
         favorites,
       });
+      await updateAvatar(user.id, avatarConfig);
       setDone(true);
       refreshProfile().catch(() => {});
-      // Re-run matching in background so new profile data is considered
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (!session?.access_token) return;
         fetch("/api/match", {
@@ -73,7 +77,6 @@ export default function ProfileSetupPage() {
     }
   }
 
-  // Validation per step
   const favoritesValid =
     favorites.length >= 1 &&
     favorites.every((f) => f.items.length >= 3);
@@ -82,7 +85,8 @@ export default function ProfileSetupPage() {
     step === 0 ? true :
     step === 1 ? interests.length >= 3 :
     step === 2 ? true :
-    favoritesValid;
+    step === 3 ? favoritesValid :
+    true; // avatar step always valid
 
   const ctaLabel =
     step < STEPS.length - 1
@@ -97,7 +101,6 @@ export default function ProfileSetupPage() {
       ? "Saving…"
       : "Finish setup";
 
-  // All done screen
   if (done) {
     return (
       <div
@@ -279,6 +282,24 @@ export default function ProfileSetupPage() {
                   Pick what you want to share, then add at least 3 in each.
                 </p>
                 <FavoritesPicker favorites={favorites} onChange={setFavorites} />
+              </motion.div>
+            )}
+
+            {step === 4 && (
+              <motion.div
+                key="avatar"
+                initial={{ opacity: 0, x: 24 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -24 }}
+                transition={{ duration: 0.22 }}
+              >
+                <h1 className="font-display text-2xl font-bold text-ink mb-1">
+                  Create your avatar
+                </h1>
+                <p className="text-sm text-ink-secondary mb-6">
+                  Design your character — your matches will see it when you connect.
+                </p>
+                <AvatarBuilder value={avatarConfig} onChange={setAvatarConfig} />
               </motion.div>
             )}
           </AnimatePresence>

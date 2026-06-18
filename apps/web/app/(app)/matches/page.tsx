@@ -38,7 +38,7 @@ function WaitingScreen() {
 }
 
 export default function MatchesPage() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const router = useRouter();
   const [matches, setMatches] = useState<MatchWithPartner[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,6 +99,8 @@ export default function MatchesPage() {
                 matchWithPartner={mwp}
                 currentUserId={user?.id ?? ""}
                 onConnect={() => handleConnect(mwp)}
+                myAvatarConfig={profile?.avatar_config}
+                myAvatarUrl={profile?.avatar_url}
               />
             ))}
           </div>
@@ -112,6 +114,10 @@ export default function MatchesPage() {
           score={Math.round(revealMatch.match.compatibility_score)}
           sharedHighlight={revealMatch.match.shared_highlights?.[0]}
           onStartChat={handleStartChat}
+          myAvatarConfig={profile?.avatar_config}
+          myAvatarUrl={profile?.avatar_url}
+          partnerAvatarConfig={revealMatch.partner.avatar_config}
+          partnerAvatarUrl={revealMatch.partner.avatar_url}
         />
       )}
     </div>

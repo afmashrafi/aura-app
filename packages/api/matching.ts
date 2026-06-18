@@ -1,9 +1,9 @@
 import { supabase } from './supabase';
 import type { Match, Profile } from '@aura/types';
 
-const PARTNER_FIELDS = 'id, first_name, bio, interests, prompt_responses, favorites';
+const PARTNER_FIELDS = 'id, first_name, bio, interests, prompt_responses, favorites, avatar_config, avatar_url';
 
-export type PartnerProfile = Pick<Profile, 'id' | 'first_name' | 'bio' | 'interests' | 'prompt_responses' | 'favorites'>;
+export type PartnerProfile = Pick<Profile, 'id' | 'first_name' | 'bio' | 'interests' | 'prompt_responses' | 'favorites' | 'avatar_config' | 'avatar_url'>;
 
 export interface MatchWithPartner {
   match: Match;
@@ -34,7 +34,7 @@ export async function getMatchesWithPartners(currentUserId: string): Promise<Mat
     const partnerId = match.user_a === currentUserId ? match.user_b : match.user_a;
     return {
       match: match as Match,
-      partner: profileMap[partnerId] ?? { id: partnerId, first_name: 'Someone', bio: null, interests: [], prompt_responses: [], favorites: [] },
+      partner: profileMap[partnerId] ?? { id: partnerId, first_name: 'Someone', bio: null, interests: [], prompt_responses: [], favorites: [], avatar_config: null, avatar_url: null },
     };
   });
 }
@@ -62,6 +62,6 @@ export async function getMatchWithPartner(
 
   return {
     match: match as Match,
-    partner: partner ?? { id: partnerId, first_name: 'Someone', bio: null, interests: [], prompt_responses: [], favorites: [] },
+    partner: partner ?? { id: partnerId, first_name: 'Someone', bio: null, interests: [], prompt_responses: [], favorites: [], avatar_config: null, avatar_url: null },
   };
 }

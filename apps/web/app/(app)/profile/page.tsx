@@ -9,6 +9,7 @@ import {
   getUserAnswers,
   saveAnswer,
   completeQuestionnaire,
+  updateAvatarUrl,
 } from "@aura/api";
 
 import type { Question } from "@aura/types";
@@ -16,6 +17,8 @@ import { useAuth } from "@/app/providers";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { FAVORITE_CATEGORY_META } from "@/components/profile/FavoritesPicker";
+import { Avatar3D } from "@/components/avatar/Avatar3D";
+import { AvatarCreatorModal } from "@/components/avatar/AvatarCreatorModal";
 
 const CATEGORY_NAMES: Record<string, string> = {
   values: "Values",
@@ -34,12 +37,14 @@ function groupByCategory(questions: Question[]) {
 }
 
 export default function ProfilePage() {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const router = useRouter();
   const [answers, setAnswers] = useState<Record<number, 0 | 1 | 2 | 3>>({});
   const [editing, setEditing] = useState<number | null>(null);
   const [saving, setSaving] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+  const [localAvatarUrl, setLocalAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -69,6 +74,17 @@ export default function ProfilePage() {
     [user, profile]
   );
 
+  async function handleAvatarExported(glbUrl: string) {
+    setAvatarModalOpen(false);
+    setLocalAvatarUrl(glbUrl);
+    if (user) {
+      await updateAvatarUrl(user.id, glbUrl).catch(() => {});
+      refreshProfile().catch(() => {});
+    }
+  }
+
+  const displayAvatarUrl = localAvatarUrl ?? profile?.avatar_url ?? null;
+
   const categorized = groupByCategory(QUESTIONS);
   const completedCount = Object.keys(answers).length;
 
@@ -96,9 +112,33 @@ export default function ProfilePage() {
       >
         {/* Profile header */}
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-16 h-16 rounded-full bg-primary-pale flex items-center justify-center font-display text-2xl text-primary font-semibold">
-            {profile?.first_name?.charAt(0).toUpperCase() ?? "?"}
+          {/* 3D avatar + edit button */}
+          <div className="flex flex-col items-center gap-1.5 shrink-0">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <Avatar3D
+                avatarUrl={displayAvatarUrl}
+                avatarConfig={profile?.avatar_config}
+                name={profile?.first_name ?? "?"}
+                size={80}
+                animate
+              />
+            </motion.div>
+            <button
+              type="button"
+              onClick={() => setAvatarModalOpen(true)}
+              className="flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/70 transition-colors"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M9 1.5L10.5 3 4.5 9H3V7.5L9 1.5Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              {displayAvatarUrl ? "Edit avatar" : "Create avatar"}
+            </button>
           </div>
+
           <div className="flex-1">
             <h1 className="font-display text-[22px] text-ink">
               {profile?.first_name}
@@ -115,6 +155,14 @@ export default function ProfilePage() {
             Edit profile
           </button>
         </div>
+
+        {/* Avatar creator modal */}
+        <AvatarCreatorModal
+          open={avatarModalOpen}
+          onClose={() => setAvatarModalOpen(false)}
+          onAvatarExported={handleAvatarExported}
+          existingUrl={displayAvatarUrl}
+        />
 
         {/* Completion bar */}
         <div className="mb-6">
