@@ -1,81 +1,36 @@
 "use client";
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/app/providers";
 import { signOut } from "@aura/api";
 
-function NavTab({
-  href, label, active, icon, activeIcon,
-}: {
-  href: string; label: string; active: boolean;
-  icon: React.ReactNode; activeIcon: React.ReactNode;
-}) {
+// Sidebar nav items
+const NAV = [
+  { href: "/matches", label: "Home",     icon: "⌂" },
+  { href: "/matches", label: "Matches",  icon: "♡" },
+  { href: "/chat",    label: "Messages", icon: "💬" },
+  { href: "/liked",   label: "Discover", icon: "◎" },
+  { href: "/profile", label: "Profile",  icon: "◉" },
+];
+
+function SidebarLink({ href, label, icon, active }: { href: string; label: string; icon: string; active: boolean }) {
   return (
     <Link
       href={href}
-      className="flex flex-col items-center justify-center gap-1 flex-1 py-2 relative transition-all"
-      aria-current={active ? "page" : undefined}
+      className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium"
+      style={{
+        background: active ? "#F5F5F5" : "transparent",
+        color: active ? "#000000" : "#6B7280",
+        fontWeight: active ? 600 : 400,
+      }}
     >
-      <span className={`transition-all duration-200 ${active ? "scale-110" : "scale-100"}`}>
-        {active ? activeIcon : icon}
-      </span>
-      <span
-        className="text-[9px] font-bold tracking-wider uppercase"
-        style={{ color: active ? "#9B7FE8" : "#9080B8" }}
-      >
-        {label}
-      </span>
-      {active && (
-        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full" style={{ background: "#9B7FE8" }} />
-      )}
+      <span className="text-base w-5 text-center">{icon}</span>
+      {label}
     </Link>
   );
 }
-
-const HomeIcon = (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-    <path d="M3 12L12 3l9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" stroke="#9080B8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-const HomeIconActive = (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-    <path d="M3 12L12 3l9 9" stroke="#9B7FE8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" stroke="#9B7FE8" fill="#EDE8FF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-const ChatIcon = (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-    <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke="#9080B8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-const ChatIconActive = (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="#EDE8FF">
-    <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke="#9B7FE8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-const HeartIcon = (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-    <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" stroke="#9080B8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-const HeartIconActive = (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="#EDE8FF">
-    <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" stroke="#9B7FE8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-const PersonIcon = (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-    <path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" stroke="#9080B8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-const PersonIconActive = (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="6" r="4" fill="#EDE8FF" stroke="#9B7FE8" strokeWidth="2"/>
-    <path d="M4.501 20.118a7.5 7.5 0 0114.998 0" stroke="#9B7FE8" strokeWidth="2" strokeLinecap="round"/>
-  </svg>
-);
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, profile, loading } = useAuth();
@@ -88,81 +43,96 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (profile && !profile.questionnaire_completed && pathname !== "/questionnaire") {
       router.replace("/questionnaire");
     }
-    if (profile && profile.questionnaire_completed && pathname === "/questionnaire") {
-      router.replace("/profile-setup");
-    }
   }, [user, profile, loading, pathname, router]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "#F9F7FF" }}>
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-9 h-9 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#C4AFF5", borderTopColor: "#9B7FE8" }} />
-          <p className="text-sm font-medium" style={{ color: "#9080B8" }}>Loading…</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="w-7 h-7 rounded-full border-2 border-black border-t-transparent animate-spin" />
       </div>
     );
   }
-
   if (!user) return null;
 
   const isQuestionnaire = pathname === "/questionnaire";
   const isChat = pathname.startsWith("/chat/");
 
-  const tabs = [
-    { href: "/matches", label: "Home",      icon: HomeIcon,   activeIcon: HomeIconActive,   active: pathname === "/matches" },
-    { href: "/chat",    label: "Chats",     icon: ChatIcon,   activeIcon: ChatIconActive,   active: pathname === "/chat" || isChat },
-    { href: "/liked",   label: "Liked You", icon: HeartIcon,  activeIcon: HeartIconActive,  active: pathname === "/liked" },
-    { href: "/profile", label: "Profile",   icon: PersonIcon, activeIcon: PersonIconActive, active: pathname === "/profile" },
+  if (isQuestionnaire) return <>{children}</>;
+
+  const mobileNav = [
+    { href: "/matches", label: "Home",     activeWhen: pathname === "/matches" },
+    { href: "/chat",    label: "Messages", activeWhen: pathname === "/chat" || isChat },
+    { href: "/liked",   label: "Discover", activeWhen: pathname === "/liked" },
+    { href: "/profile", label: "Profile",  activeWhen: pathname === "/profile" },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "#F9F7FF" }}>
-      {!isQuestionnaire && (
-        <header
-          className="sticky top-0 z-40"
-          style={{
-            background: "rgba(249,247,255,0.94)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            borderBottom: "1px solid #E3D9FF",
-          }}
-        >
-          <div className="max-w-lg mx-auto px-5 h-14 flex items-center justify-between">
-            <span className="font-brand text-xl font-bold" style={{ color: "#9B7FE8" }}>
-              aura<sup className="text-xs font-normal">+</sup>
-            </span>
-            {!isChat && (
-              <button
-                onClick={async () => { await signOut(); router.push("/"); }}
-                className="text-sm font-medium transition-colors"
-                style={{ color: "#9080B8" }}
-              >
-                Sign out
-              </button>
-            )}
-          </div>
+    <div className="min-h-screen bg-white flex">
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex flex-col w-64 shrink-0 border-r border-[#E5E5E5] px-3 py-6 sticky top-0 h-screen">
+        <Link href="/matches" className="font-brand text-xl font-bold text-black px-4 mb-8 block">
+          aura
+        </Link>
+        <nav className="flex flex-col gap-1 flex-1">
+          {NAV.map((item) => (
+            <SidebarLink
+              key={item.label}
+              href={item.href}
+              label={item.label}
+              icon={item.icon}
+              active={
+                item.href === "/matches" ? pathname === "/matches" :
+                item.href === "/chat" ? pathname === "/chat" || isChat :
+                pathname === item.href
+              }
+            />
+          ))}
+        </nav>
+        <div className="flex flex-col gap-1">
+          <Link href="/settings" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[#6B7280] hover:bg-[#F5F5F5] transition-colors">
+            <span className="text-base w-5 text-center">⚙</span> Settings
+          </Link>
+          <button
+            onClick={async () => { await signOut(); router.push("/"); }}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[#6B7280] hover:bg-[#F5F5F5] transition-colors w-full text-left"
+          >
+            <span className="text-base w-5 text-center">↩</span> Logout
+          </button>
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col min-h-screen">
+        {/* Mobile header */}
+        <header className="lg:hidden sticky top-0 z-40 bg-white border-b border-[#E5E5E5] px-5 h-14 flex items-center justify-between">
+          <span className="font-brand text-lg font-bold text-black">aura</span>
+          {!isChat && (
+            <button onClick={async () => { await signOut(); router.push("/"); }} className="text-sm text-[#6B7280]">
+              Logout
+            </button>
+          )}
         </header>
-      )}
 
-      <main className="flex-1">{children}</main>
+        <main className="flex-1 pb-20 lg:pb-0">{children}</main>
 
-      {!isQuestionnaire && (
-        <nav
-          className="sticky bottom-0 z-40"
-          style={{
-            background: "rgba(255,255,255,0.97)",
-            borderTop: "1px solid #E3D9FF",
-            boxShadow: "0 -4px 24px rgba(155,127,232,0.08)",
-          }}
-        >
-          <div className="max-w-lg mx-auto flex" style={{ height: "64px" }}>
-            {tabs.map((tab) => (
-              <NavTab key={tab.href} {...tab} />
+        {/* Mobile bottom nav */}
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#E5E5E5]">
+          <div className="flex" style={{ height: "60px" }}>
+            {mobileNav.map((tab) => (
+              <Link
+                key={tab.href}
+                href={tab.href}
+                className="flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors"
+              >
+                <span className="text-[11px] font-semibold" style={{ color: tab.activeWhen ? "#000000" : "#9CA3AF" }}>
+                  {tab.label}
+                </span>
+                {tab.activeWhen && <span className="w-1 h-1 rounded-full bg-black" />}
+              </Link>
             ))}
           </div>
         </nav>
-      )}
+      </div>
     </div>
   );
 }

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { signUp } from "@aura/api";
-import { Input } from "@/components/ui/Input";
 
 const GENDER_OPTIONS = ["Man", "Woman", "Non-binary", "Prefer not to say"] as const;
 const INTEREST_OPTIONS = ["Men", "Women", "Non-binary people"] as const;
@@ -27,17 +26,16 @@ function SelectRow({ label, selected, onClick }: { label: string; selected: bool
       whileTap={{ scale: 0.98 }}
       className="flex items-center justify-between w-full px-5 h-[60px] rounded-2xl text-base font-medium transition-all text-left"
       style={{
-        background: selected ? "#EDE8FF" : "#F8F4FF",
-        border: `2px solid ${selected ? "#9B7FE8" : "transparent"}`,
-        color: "#1E1040",
+        background: selected ? "#F5F5F5" : "#F5F5F5",
+        border: `2px solid ${selected ? "#000000" : "transparent"}`,
+        color: "#000000",
       }}
     >
       <span>{label}</span>
       <motion.div
         animate={{ scale: selected ? 1 : 0.5, opacity: selected ? 1 : 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 20 }}
-        className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-        style={{ background: "#9B7FE8" }}
+        className="w-7 h-7 rounded-full bg-black flex items-center justify-center shrink-0"
       >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M2.5 7l3 3 6-7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -56,8 +54,7 @@ function CircleNext({ onClick, disabled, loading }: { onClick: () => void; disab
       whileTap={{ scale: 0.9 }}
       className="w-16 h-16 rounded-full flex items-center justify-center shrink-0 transition-all"
       style={{
-        background: disabled ? "#EDE8FF" : "#9B7FE8",
-        boxShadow: disabled ? "none" : "0 8px 28px rgba(128,128,255,0.45)",
+        background: disabled ? "#E5E5E5" : "#000000",
       }}
     >
       {loading ? (
@@ -135,12 +132,13 @@ export default function SignUpPage() {
       question: "What's your first name?",
       hint: "This is how you'll appear to your matches.",
       content: (
-        <Input
-          label=""
+        <input
+          type="text"
           placeholder="First name"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
           autoComplete="given-name"
+          className="w-full px-4 py-3.5 rounded-xl bg-[#F5F5F5] border border-transparent text-black placeholder-[#9CA3AF] text-base focus:outline-none focus:border-black transition-colors"
         />
       ),
     },
@@ -149,10 +147,22 @@ export default function SignUpPage() {
       hint: "We'll never share your email with anyone.",
       content: (
         <div className="flex flex-col gap-4">
-          <Input label="" type="email" placeholder="Email address" value={email}
-            onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
-          <Input label="" type="password" placeholder="Password (min. 8 chars)" value={password}
-            onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
+          <input
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            className="w-full px-4 py-3.5 rounded-xl bg-[#F5F5F5] border border-transparent text-black placeholder-[#9CA3AF] text-base focus:outline-none focus:border-black transition-colors"
+          />
+          <input
+            type="password"
+            placeholder="Password (min. 8 chars)"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
+            className="w-full px-4 py-3.5 rounded-xl bg-[#F5F5F5] border border-transparent text-black placeholder-[#9CA3AF] text-base focus:outline-none focus:border-black transition-colors"
+          />
         </div>
       ),
     },
@@ -160,12 +170,12 @@ export default function SignUpPage() {
       question: "When's your birthday?",
       hint: "Your age will be shown on your profile. You must be 18+.",
       content: (
-        <Input
-          label=""
+        <input
           type="date"
           value={dob}
           onChange={(e) => setDob(e.target.value)}
           max={new Date(Date.now() - 18 * 365.25 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]}
+          className="w-full px-4 py-3.5 rounded-xl bg-[#F5F5F5] border border-transparent text-black text-base focus:outline-none focus:border-black transition-colors"
         />
       ),
     },
@@ -199,9 +209,9 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Progress bar */}
-      <div className="h-1.5 bg-surface w-full shrink-0">
+      <div className="h-1 bg-[#F5F5F5] w-full shrink-0">
         <motion.div
-          className="h-full bg-primary rounded-full"
+          className="h-full bg-black rounded-full"
           animate={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
           transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
         />
@@ -209,8 +219,8 @@ export default function SignUpPage() {
 
       {/* Top bar */}
       <div className="shrink-0 flex items-center justify-between px-5 h-14">
-        <Link href="/" className="font-brand text-xl text-ink">Aura</Link>
-        <Link href="/sign-in" className="text-sm font-medium text-ink-muted hover:text-ink transition-colors">
+        <Link href="/" className="font-brand text-xl font-bold text-black">aura</Link>
+        <Link href="/sign-in" className="text-sm font-medium text-[#6B7280] hover:text-black transition-colors">
           Sign in
         </Link>
       </div>
@@ -230,12 +240,12 @@ export default function SignUpPage() {
           >
             {/* Question */}
             <h1
-              className="font-display font-black leading-tight mb-2"
-              style={{ fontSize: "clamp(28px, 8vw, 38px)", color: "#1E1040" }}
+              className="font-display font-black leading-tight mb-2 text-black"
+              style={{ fontSize: "clamp(28px, 8vw, 38px)" }}
             >
               {current.question}
             </h1>
-            <p className="text-sm mb-7 leading-relaxed" style={{ color: "#9080B8" }}>
+            <p className="text-sm mb-7 leading-relaxed text-[#6B7280]">
               {current.hint}
             </p>
 
@@ -247,7 +257,7 @@ export default function SignUpPage() {
             {serverError && (
               <motion.p
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                className="text-sm text-danger text-center bg-danger/5 rounded-xl p-3 mt-4"
+                className="text-sm text-red-500 text-center bg-red-50 rounded-xl p-3 mt-4"
               >
                 {serverError}
               </motion.p>
@@ -259,8 +269,7 @@ export default function SignUpPage() {
                 <button
                   type="button"
                   onClick={goBack}
-                  className="flex items-center gap-1.5 text-sm font-semibold"
-                  style={{ color: "#9080B8" }}
+                  className="flex items-center gap-1.5 text-sm font-semibold text-[#6B7280] hover:text-black transition-colors"
                 >
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M12 5l-5 5 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -277,14 +286,14 @@ export default function SignUpPage() {
             </div>
 
             {step === 0 && (
-              <p className="text-center text-xs mt-5" style={{ color: "#9080B8" }}>
+              <p className="text-center text-xs mt-5 text-[#6B7280]">
                 Already have an account?{" "}
-                <Link href="/sign-in" className="font-semibold underline" style={{ color: "#9B7FE8" }}>Sign in</Link>
+                <Link href="/sign-in" className="font-semibold underline text-black">Sign in</Link>
               </p>
             )}
 
             {isLast && (
-              <p className="text-center text-xs mt-4 leading-relaxed" style={{ color: "#9080B8" }}>
+              <p className="text-center text-xs mt-4 leading-relaxed text-[#6B7280]">
                 By creating an account you agree to our Terms of Service and Privacy Policy.
               </p>
             )}

@@ -1,143 +1,44 @@
 @import "tailwindcss";
 
 @theme {
-  /* Brand colors — light lavender palette */
-  --color-primary: #9B7FE8;
-  --color-primary-dark: #7B5BE0;
-  --color-primary-light: #C4AFF5;
-  --color-primary-pale: #EDE8FF;
-
-  /* Surface colors */
-  --color-surface: #F8F4FF;
-  --color-surface-deep: #EDE8FF;
-
-  /* Text colors */
-  --color-ink: #1E1040;
-  --color-ink-secondary: #4A3870;
-  --color-ink-muted: #9080B8;
-
-  /* Utility colors */
-  --color-divider: #E3D9FF;
-  --color-focus-ring: #C4AFF5;
+  --color-primary: #000000;
+  --color-primary-light: #333333;
+  --color-primary-pale: #F5F5F5;
+  --color-surface: #F5F5F5;
+  --color-surface-deep: #EFEFEF;
+  --color-ink: #000000;
+  --color-ink-secondary: #111111;
+  --color-ink-muted: #6B7280;
+  --color-divider: #E5E5E5;
+  --color-focus-ring: #000000;
   --color-success: #10B981;
   --color-danger: #EF4444;
-
-  /* Typography */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-brand: var(--font-space), ui-sans-serif, system-ui, sans-serif;
-
-  /* Animations */
-  --animate-blob: blob 10s ease-in-out infinite;
-  --animate-blob-delay: blob 12s ease-in-out 2s infinite;
-  --animate-blob-slow: blob 14s ease-in-out 4s infinite;
-  --animate-float: float 4s ease-in-out infinite;
-  --animate-float-slow: float 6s ease-in-out infinite;
-  --animate-heart-beat: heart-beat 1.8s ease-in-out infinite;
-}
-
-@keyframes blob {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(25px, -20px) scale(1.06); }
-  66% { transform: translate(-18px, 12px) scale(0.94); }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px) scale(1); }
-  50% { transform: translateY(-12px) scale(1.02); }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
 }
-
-@keyframes heart-beat {
-  0%, 100% { transform: scale(1); }
-  20% { transform: scale(1.08); }
-  40% { transform: scale(1); }
-  60% { transform: scale(1.05); }
-}
-
 @keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
+.scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
 
-/* ─── Glass effects ─── */
-.glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 4px 24px rgba(155, 127, 232, 0.08);
-}
-
-/* Primary button */
-.btn-glass-primary {
-  position: relative;
-  background: linear-gradient(135deg, #9B7FE8 0%, #7B5BE0 100%);
-  color: white;
-  box-shadow: 0 4px 20px rgba(155, 127, 232, 0.40);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-  overflow: hidden;
-}
-.btn-glass-primary::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 60%);
-  pointer-events: none;
-}
-.btn-glass-primary:hover:not(:disabled) {
-  box-shadow: 0 8px 32px rgba(155, 127, 232, 0.55);
-  transform: scale(1.02) translateY(-1px);
-}
-.btn-glass-primary:active:not(:disabled) {
-  transform: scale(0.97) translateY(0);
-}
-
-/* Ghost button */
-.btn-glass-ghost {
-  position: relative;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1.5px solid rgba(155, 127, 232, 0.3);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-}
-.btn-glass-ghost:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.8);
-  transform: scale(1.01) translateY(-1px);
-}
-.btn-glass-ghost:active:not(:disabled) {
-  transform: scale(0.97);
-}
-
-/* ─── end glass ─── */
-
-.scrollbar-hide {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-body {
-  background-color: #F8F4FF;
-  color: #1E1040;
-}
-
-:focus-visible {
-  outline: 2px solid #C4AFF5;
-  outline-offset: 2px;
-}
+body { background: #FFFFFF; color: #000000; }
+:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
