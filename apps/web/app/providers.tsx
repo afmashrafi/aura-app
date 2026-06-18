@@ -58,15 +58,18 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      const u = session?.user ?? null;
-      setUser(u);
-      if (u) {
-        const p = await fetchProfile(u.id);
-        setProfile(p);
-        if (p?.questionnaire_completed) runMatchingInBackground(u.id);
+      try {
+        const u = session?.user ?? null;
+        setUser(u);
+        if (u) {
+          const p = await fetchProfile(u.id);
+          setProfile(p);
+          if (p?.questionnaire_completed) runMatchingInBackground(u.id);
+        }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    }).catch(() => setLoading(false));
 
     const {
       data: { subscription },
