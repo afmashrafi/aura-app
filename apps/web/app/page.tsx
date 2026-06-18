@@ -41,9 +41,9 @@ export default function LandingPage() {
       <section className="max-w-6xl mx-auto px-6 pt-20 pb-24 flex flex-col md:flex-row items-center gap-16">
         {/* Copy */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          initial={{ y: 16 }}
+          animate={{ y: 0 }}
+          transition={{ duration: 0.5 }}
           className="flex-1"
         >
           <h1 className="font-display font-black leading-tight mb-5 text-black" style={{ fontSize: "clamp(40px, 6vw, 68px)" }}>
@@ -65,9 +65,9 @@ export default function LandingPage() {
 
         {/* Visual */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          initial={{ scale: 0.97 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
           className="hidden md:flex shrink-0 w-80 h-80 bg-[#F5F5F5] rounded-3xl items-center justify-center"
         >
           <div className="text-center">

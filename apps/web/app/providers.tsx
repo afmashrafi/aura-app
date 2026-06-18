@@ -57,6 +57,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
+    const timeout = setTimeout(() => setLoading(false), 5000);
+
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       try {
         const u = session?.user ?? null;
@@ -67,9 +69,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
           if (p?.questionnaire_completed) runMatchingInBackground(u.id);
         }
       } finally {
+        clearTimeout(timeout);
         setLoading(false);
       }
-    }).catch(() => setLoading(false));
+    }).catch(() => { clearTimeout(timeout); setLoading(false); });
 
     const {
       data: { subscription },
