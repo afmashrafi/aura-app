@@ -5,12 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { signUp } from "@aura/api";
-import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Pill } from "@/components/ui/Pill";
 
 const GENDER_OPTIONS = ["Man", "Woman", "Non-binary", "Prefer not to say"] as const;
-const INTEREST_OPTIONS = ["Men", "Women", "Everyone"] as const;
+const INTEREST_OPTIONS = ["Men", "Women", "Non-binary people"] as const;
 
 function getAge(dob: string): number {
   const today = new Date();
@@ -21,60 +19,100 @@ function getAge(dob: string): number {
   return age;
 }
 
+function SelectRow({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
+  return (
+    <motion.button
+      type="button"
+      onClick={onClick}
+      whileTap={{ scale: 0.98 }}
+      className="flex items-center justify-between w-full px-5 h-[60px] rounded-2xl text-base font-medium transition-all text-left"
+      style={{
+        background: selected ? "#E6E6FF" : "#F8F8FF",
+        border: `2px solid ${selected ? "#8080FF" : "transparent"}`,
+        color: "#1E1B4B",
+      }}
+    >
+      <span>{label}</span>
+      <motion.div
+        animate={{ scale: selected ? 1 : 0.5, opacity: selected ? 1 : 0 }}
+        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+        className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
+        style={{ background: "#8080FF" }}
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M2.5 7l3 3 6-7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </motion.div>
+    </motion.button>
+  );
+}
+
+function CircleNext({ onClick, disabled, loading }: { onClick: () => void; disabled: boolean; loading: boolean }) {
+  return (
+    <motion.button
+      type="button"
+      onClick={onClick}
+      disabled={disabled || loading}
+      whileTap={{ scale: 0.9 }}
+      className="w-16 h-16 rounded-full flex items-center justify-center shrink-0 transition-all"
+      style={{
+        background: disabled ? "#E0E0FF" : "#8080FF",
+        boxShadow: disabled ? "none" : "0 8px 28px rgba(128,128,255,0.45)",
+      }}
+    >
+      {loading ? (
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white"
+        />
+      ) : (
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M5 11h12M12 5l6 6-6 6" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )}
+    </motion.button>
+  );
+}
+
+const TOTAL_STEPS = 5;
+
+const slideVariants = {
+  enter: (dir: number) => ({ opacity: 0, x: dir > 0 ? 40 : -40 }),
+  center: { opacity: 1, x: 0 },
+  exit: (dir: number) => ({ opacity: 0, x: dir > 0 ? -40 : 40 }),
+};
+
 export default function SignUpPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
+  const [dir, setDir] = useState(1);
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
   const [interestedIn, setInterestedIn] = useState<string[]>([]);
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
 
-  function toggleInterest(option: string) {
-    setInterestedIn((prev) =>
-      prev.includes(option) ? prev.filter((o) => o !== option) : [...prev, option]
-    );
+  function goNext() { setDir(1); setStep((s) => s + 1); setServerError(""); }
+  function goBack() { setDir(-1); setStep((s) => s - 1); setServerError(""); }
+  function toggleInterest(o: string) {
+    setInterestedIn((prev) => prev.includes(o) ? prev.filter((x) => x !== o) : [...prev, o]);
   }
 
-  function validateStep0(): boolean {
-    const errs: Record<string, string> = {};
-    if (!firstName.trim()) errs.firstName = "First name is required.";
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      errs.email = "Enter a valid email address.";
-    if (password.length < 8)
-      errs.password = "Password must be at least 8 characters.";
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
+  function canAdvance(): boolean {
+    if (step === 0) return firstName.trim().length >= 1;
+    if (step === 1) return email.includes("@") && password.length >= 8;
+    if (step === 2) return !!dob && getAge(dob) >= 18;
+    if (step === 3) return !!gender;
+    if (step === 4) return interestedIn.length > 0;
+    return true;
   }
 
-  function validateStep1(): boolean {
-    const errs: Record<string, string> = {};
-    if (!dob) {
-      errs.dob = "Date of birth is required.";
-    } else if (getAge(dob) < 18) {
-      errs.dob = "You must be at least 18 years old.";
-    }
-    if (!gender) errs.gender = "Please select a gender identity.";
-    if (interestedIn.length === 0)
-      errs.interestedIn = "Please select at least one option.";
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
-  }
-
-  function handleNext() {
-    if (validateStep0()) {
-      setErrors({});
-      setStep(1);
-    }
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!validateStep1()) return;
+  async function handleFinish() {
+    if (!canAdvance()) return;
     setLoading(true);
     setServerError("");
     try {
@@ -92,250 +130,167 @@ export default function SignUpPage() {
     }
   }
 
-  return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ background: "linear-gradient(160deg, #ABABFF 0%, #BFBFFF 35%, #D3D3FF 100%)" }}
-    >
-      {/* Hero header */}
-      <div className="relative flex flex-col items-center justify-center pt-14 pb-8 px-6 overflow-hidden">
-        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div className="absolute w-72 h-72 rounded-full opacity-50 -top-16 -left-16"
-            style={{ background: "radial-gradient(circle, #FFFFFF, transparent 65%)" }} />
-          <div className="absolute w-56 h-56 rounded-full opacity-35 -top-8 right-0"
-            style={{ background: "radial-gradient(circle, #F3F3FF, transparent 65%)" }} />
+  const STEPS = [
+    {
+      question: "What's your first name?",
+      hint: "This is how you'll appear to your matches.",
+      content: (
+        <Input
+          label=""
+          placeholder="First name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          autoComplete="given-name"
+        />
+      ),
+    },
+    {
+      question: "Create your account",
+      hint: "We'll never share your email with anyone.",
+      content: (
+        <div className="flex flex-col gap-4">
+          <Input label="" type="email" placeholder="Email address" value={email}
+            onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
+          <Input label="" type="password" placeholder="Password (min. 8 chars)" value={password}
+            onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
         </div>
-
-        {/* Floating pills */}
-        {[
-          { text: "ENFP",      x: "6%",  y: "16%", r: "-7deg" },
-          { text: "anime fan", x: "66%", y: "10%", r: "5deg"  },
-          { text: "dreamer",   x: "74%", y: "58%", r: "-6deg" },
-        ].map((p, i) => (
-          <motion.span
-            key={p.text}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4 + i * 0.1, duration: 0.4 }}
-            className="glass-float absolute hidden sm:inline-block text-xs font-semibold px-3 py-1.5 rounded-full"
-            style={{ left: p.x, top: p.y, rotate: p.r, color: "#5B5B8A" }}
-          >
-            {p.text}
-          </motion.span>
-        ))}
-
-        {/* Logo */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.45, ease: [0.34, 1.56, 0.64, 1] }}
-          className="relative z-10 mb-4"
-        >
-          <Link href="/">
-            <div
-              className="glass w-14 h-14 rounded-2xl flex items-center justify-center mx-auto"
-            >
-              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-                <circle cx="11" cy="16" r="9" fill="#8080FF" opacity="0.7" />
-                <circle cx="21" cy="16" r="9" fill="#ABABFF" opacity="0.65" />
-              </svg>
-            </div>
-          </Link>
-        </motion.div>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.4 }}
-          className="relative z-10 font-display text-[28px] font-bold leading-tight text-center mb-1.5"
-          style={{ color: "#1E1B4B" }}
-        >
-          Create your account
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.18, duration: 0.4 }}
-          className="relative z-10 text-sm text-center"
-          style={{ color: "#5B5B8A" }}
-        >
-          Already have an account?{" "}
-          <Link href="/sign-in" className="font-semibold underline underline-offset-2" style={{ color: "#3D3A7A" }}>
-            Sign in
-          </Link>
-        </motion.p>
-
-        {/* Step dots */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="relative z-10 flex items-center gap-2 mt-5"
-        >
-          {[0, 1].map((i) => (
-            <div
-              key={i}
-              className="h-2 rounded-full transition-all duration-300"
-              style={{
-                width: i === step ? "24px" : "8px",
-                background: i === step ? "#1E1B4B" : "rgba(30,27,75,0.25)",
-              }}
-            />
+      ),
+    },
+    {
+      question: "When's your birthday?",
+      hint: "Your age will be shown on your profile. You must be 18+.",
+      content: (
+        <Input
+          label=""
+          type="date"
+          value={dob}
+          onChange={(e) => setDob(e.target.value)}
+          max={new Date(Date.now() - 18 * 365.25 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]}
+        />
+      ),
+    },
+    {
+      question: "I identify as…",
+      hint: "You'll only be shown to people looking to meet your gender.",
+      content: (
+        <div className="flex flex-col gap-3">
+          {GENDER_OPTIONS.map((o) => (
+            <SelectRow key={o} label={o} selected={gender === o} onClick={() => setGender(o)} />
           ))}
-        </motion.div>
+        </div>
+      ),
+    },
+    {
+      question: "Who would you like to meet?",
+      hint: "You can choose more than one answer and change it any time.",
+      content: (
+        <div className="flex flex-col gap-3">
+          {INTEREST_OPTIONS.map((o) => (
+            <SelectRow key={o} label={o} selected={interestedIn.includes(o)} onClick={() => toggleInterest(o)} />
+          ))}
+        </div>
+      ),
+    },
+  ];
+
+  const isLast = step === TOTAL_STEPS - 1;
+  const current = STEPS[step];
+
+  return (
+    <div className="min-h-screen flex flex-col bg-white">
+      {/* Progress bar */}
+      <div className="h-1.5 bg-surface w-full shrink-0">
+        <motion.div
+          className="h-full bg-primary rounded-full"
+          animate={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
+          transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+        />
       </div>
 
-      {/* Form card */}
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.22, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-        className="flex-1 rounded-t-[32px] px-6 pt-8 pb-10 overflow-y-auto"
-        style={{
-          background: "rgba(255,255,255,0.75)",
-          backdropFilter: "blur(40px) saturate(200%)",
-          WebkitBackdropFilter: "blur(40px) saturate(200%)",
-          borderTop: "1.5px solid rgba(255,255,255,0.9)",
-          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.95), 0 -8px 40px rgba(128,128,255,0.10)",
-        }}
-      >
-        <div className="max-w-sm mx-auto">
-          <AnimatePresence mode="wait">
-            {step === 0 ? (
-              <motion.div
-                key="step0"
-                initial={{ opacity: 0, x: 24 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -24 }}
-                transition={{ duration: 0.3 }}
-                className="flex flex-col gap-5"
+      {/* Top bar */}
+      <div className="shrink-0 flex items-center justify-between px-5 h-14">
+        <Link href="/" className="font-brand text-xl text-ink">Aura</Link>
+        <Link href="/sign-in" className="text-sm font-medium text-ink-muted hover:text-ink transition-colors">
+          Sign in
+        </Link>
+      </div>
+
+      {/* Step content */}
+      <div className="flex-1 px-6 pt-2 pb-8 flex flex-col overflow-hidden">
+        <AnimatePresence mode="wait" custom={dir}>
+          <motion.div
+            key={step}
+            custom={dir}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.26, ease: [0.4, 0, 0.2, 1] }}
+            className="flex flex-col flex-1"
+          >
+            {/* Question */}
+            <h1
+              className="font-display font-black leading-tight mb-2"
+              style={{ fontSize: "clamp(28px, 8vw, 38px)", color: "#1E1B4B" }}
+            >
+              {current.question}
+            </h1>
+            <p className="text-sm mb-7 leading-relaxed" style={{ color: "#9090BB" }}>
+              {current.hint}
+            </p>
+
+            {/* Fields */}
+            <div className="flex-1 overflow-y-auto">
+              {current.content}
+            </div>
+
+            {serverError && (
+              <motion.p
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                className="text-sm text-danger text-center bg-danger/5 rounded-xl p-3 mt-4"
               >
-                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#9090BB" }}>
-                  Step 1 of 2 — Your basics
-                </p>
-                <Input
-                  label="First name"
-                  placeholder="Your first name"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  error={errors.firstName}
-                  autoComplete="given-name"
-                />
-                <Input
-                  label="Email address"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  error={errors.email}
-                  autoComplete="email"
-                />
-                <Input
-                  label="Password"
-                  type="password"
-                  placeholder="Min. 8 characters"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  error={errors.password}
-                  autoComplete="new-password"
-                />
-                <Button onClick={handleNext} className="w-full h-14 text-base font-semibold rounded-2xl mt-1">
-                  Continue
-                  <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </Button>
-              </motion.div>
-            ) : (
-              <motion.form
-                key="step1"
-                initial={{ opacity: 0, x: 24 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -24 }}
-                transition={{ duration: 0.3 }}
-                onSubmit={handleSubmit}
-                className="flex flex-col gap-5"
-                noValidate
-              >
-                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#9090BB" }}>
-                  Step 2 of 2 — About you
-                </p>
-
-                <Input
-                  label="Date of birth"
-                  type="date"
-                  value={dob}
-                  onChange={(e) => setDob(e.target.value)}
-                  error={errors.dob}
-                  max={new Date(Date.now() - 18 * 365.25 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]}
-                />
-
-                <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium" style={{ color: "#1E1B4B" }}>Gender identity</label>
-                  <select
-                    value={gender}
-                    onChange={(e) => setGender(e.target.value)}
-                    className="h-11 px-4 rounded-[12px] border text-base appearance-none focus:outline-none focus:ring-2 transition-all"
-                    style={{
-                      background: "#F3F3FF",
-                      borderColor: errors.gender ? "#EF4444" : "#E0E0FF",
-                      color: "#1E1B4B",
-                    }}
-                  >
-                    <option value="" disabled>Select one</option>
-                    {GENDER_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
-                  </select>
-                  {errors.gender && <p className="text-sm text-danger" role="alert">{errors.gender}</p>}
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium" style={{ color: "#1E1B4B" }}>Interested in</label>
-                  <div className="flex flex-wrap gap-2" role="group">
-                    {INTEREST_OPTIONS.map((o) => (
-                      <Pill key={o} selected={interestedIn.includes(o)} onClick={() => toggleInterest(o)}>
-                        {o}
-                      </Pill>
-                    ))}
-                  </div>
-                  {errors.interestedIn && <p className="text-sm text-danger" role="alert">{errors.interestedIn}</p>}
-                </div>
-
-                {serverError && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-sm text-danger text-center bg-danger/5 rounded-xl p-3"
-                    role="alert"
-                  >
-                    {serverError}
-                  </motion.p>
-                )}
-
-                <div className="flex gap-3 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => { setStep(0); setErrors({}); }}
-                    className="h-14 px-5 rounded-2xl font-semibold text-sm flex items-center gap-1.5 transition-colors shrink-0"
-                    style={{ border: "1.5px solid #E0E0FF", color: "#5B5B8A", background: "white" }}
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    Back
-                  </button>
-                  <Button type="submit" loading={loading} className="flex-1 h-14 text-base font-semibold rounded-2xl">
-                    Create account
-                  </Button>
-                </div>
-
-                <p className="text-xs text-center leading-relaxed" style={{ color: "#9090BB" }}>
-                  By creating an account you agree to our Terms of Service and Privacy Policy.
-                </p>
-              </motion.form>
+                {serverError}
+              </motion.p>
             )}
-          </AnimatePresence>
-        </div>
-      </motion.div>
+
+            {/* Navigation row */}
+            <div className="flex items-center justify-between mt-8">
+              {step > 0 ? (
+                <button
+                  type="button"
+                  onClick={goBack}
+                  className="flex items-center gap-1.5 text-sm font-semibold"
+                  style={{ color: "#9090BB" }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M12 5l-5 5 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Back
+                </button>
+              ) : <div />}
+
+              <CircleNext
+                onClick={isLast ? handleFinish : goNext}
+                disabled={!canAdvance()}
+                loading={isLast ? loading : false}
+              />
+            </div>
+
+            {step === 0 && (
+              <p className="text-center text-xs mt-5" style={{ color: "#9090BB" }}>
+                Already have an account?{" "}
+                <Link href="/sign-in" className="font-semibold underline" style={{ color: "#8080FF" }}>Sign in</Link>
+              </p>
+            )}
+
+            {isLast && (
+              <p className="text-center text-xs mt-4 leading-relaxed" style={{ color: "#9090BB" }}>
+                By creating an account you agree to our Terms of Service and Privacy Policy.
+              </p>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

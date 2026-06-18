@@ -1,333 +1,168 @@
 "use client";
 
-import { useRef } from "react";
 import Link from "next/link";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion } from "framer-motion";
 
-const PILLS = [
-  { text: "INTJ",          rotate: "-6deg",  delay: 0,    x: "6%",   y: "10%",  parallax: -0.3 },
-  { text: "bookworm",      rotate: "5deg",   delay: 0.1,  x: "70%",  y: "7%",   parallax: -0.5 },
-  { text: "anime fan",     rotate: "-4deg",  delay: 0.15, x: "78%",  y: "26%",  parallax: -0.2 },
-  { text: "night owl",     rotate: "7deg",   delay: 0.2,  x: "4%",   y: "36%",  parallax: -0.4 },
-  { text: "music lover",   rotate: "-8deg",  delay: 0.05, x: "60%",  y: "54%",  parallax: -0.35 },
-  { text: "film buff",     rotate: "4deg",   delay: 0.25, x: "8%",   y: "60%",  parallax: -0.25 },
-  { text: "deep thinker",  rotate: "-5deg",  delay: 0.3,  x: "72%",  y: "70%",  parallax: -0.45 },
-  { text: "coffee addict", rotate: "6deg",   delay: 0.1,  x: "12%",  y: "78%",  parallax: -0.3 },
-  { text: "ENFP",          rotate: "-3deg",  delay: 0.35, x: "54%",  y: "84%",  parallax: -0.2 },
-  { text: "poet",          rotate: "8deg",   delay: 0.2,  x: "80%",  y: "88%",  parallax: -0.4 },
-];
-
-const HOW_STEPS = [
-  {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <path d="M14 3C8 3 3 8 3 14s5 11 11 11 11-5 11-11S20 3 14 3z" stroke="#8080FF" strokeWidth="1.8" fill="none"/>
-        <path d="M10 14h8M14 10v8" stroke="#8080FF" strokeWidth="1.8" strokeLinecap="round"/>
-      </svg>
-    ),
-    title: "Answer 30 deep questions",
-    desc: "Share your values, lifestyle, and what you're really looking for — no photos, no filters.",
-  },
-  {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <circle cx="10" cy="14" r="7" stroke="#8080FF" strokeWidth="1.8" fill="none"/>
-        <circle cx="18" cy="14" r="7" stroke="#ABABFF" strokeWidth="1.8" fill="none"/>
-      </svg>
-    ),
-    title: "Get compatibility scores",
-    desc: "Our algorithm weighs what matters — values count 4× more than lifestyle preferences.",
-  },
-  {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <path d="M5 14c0-3 2-5 5-5s5 2 5 5-2 5-5 5-5-2-5-5z" stroke="#8080FF" strokeWidth="1.8" fill="none"/>
-        <path d="M18 9c2.5 0 5 2 5 5s-2.5 5-5 5" stroke="#ABABFF" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
-        <path d="M14 14h4" stroke="#8080FF" strokeWidth="1.8" strokeLinecap="round"/>
-      </svg>
-    ),
-    title: "Connect authentically",
-    desc: "See exactly what you share, then start a real conversation based on who you both are.",
-  },
-];
-
-const FEATURES = [
-  { emoji: "🧠", title: "Personality-first", body: "We match on who you are, not what you look like. 30 questions reveal your true self." },
-  { emoji: "🔒", title: "Private by design", body: "No photos. No location tracking. Your data stays yours — always encrypted end-to-end." },
-  { emoji: "💜", title: "Depth over swipes", body: "One meaningful match beats a thousand hollow likes. Quality connections, not dopamine hits." },
-];
-
-function ParallaxPill({ pill, index, scrollYProgress }: {
-  pill: typeof PILLS[number];
-  index: number;
-  scrollYProgress: ReturnType<typeof useScroll>["scrollYProgress"];
+// Floating orb — purely decorative background shape
+function Orb({ cx, cy, r, color, opacity, delay = 0 }: {
+  cx: string; cy: string; r: string; color: string; opacity: number; delay?: number;
 }) {
-  const yVal = useTransform(scrollYProgress, [0, 0.4], [0, pill.parallax * 300]);
-  const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.6 + pill.delay, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
-      style={{ left: pill.x, top: pill.y, y: yVal, opacity }}
-      className="absolute hidden sm:block pointer-events-none select-none"
-    >
-      <motion.span
-        animate={{ y: [0, index % 2 === 0 ? -7 : 7, 0] }}
-        transition={{ duration: 4 + index * 0.3, repeat: Infinity, ease: "easeInOut", delay: index * 0.4 }}
-        className="glass-float inline-block px-4 py-2 rounded-full text-sm font-semibold"
-        style={{ rotate: pill.rotate, color: "#5B5B8A" }}
-      >
-        {pill.text}
-      </motion.span>
-    </motion.div>
+      className="absolute rounded-full pointer-events-none"
+      style={{
+        left: cx, top: cy, width: r, height: r,
+        background: `radial-gradient(circle at 35% 35%, ${color}, transparent 70%)`,
+        opacity,
+        transform: "translate(-50%, -50%)",
+      }}
+      animate={{ scale: [1, 1.08, 1], opacity: [opacity, opacity * 1.3, opacity] }}
+      transition={{ duration: 6 + delay, repeat: Infinity, ease: "easeInOut", delay }}
+    />
   );
 }
 
 export default function LandingPage() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const heroRef = useRef<HTMLDivElement>(null);
-
-  const { scrollYProgress } = useScroll({ target: containerRef });
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 80, damping: 25 });
-
-  // Hero parallax transforms
-  const heroY = useTransform(smoothProgress, [0, 0.35], [0, -120]);
-  const heroScale = useTransform(smoothProgress, [0, 0.35], [1, 0.92]);
-  const heroOpacity = useTransform(smoothProgress, [0, 0.28], [1, 0]);
-
-  // Background gradient shift
-  const bgOpacity1 = useTransform(smoothProgress, [0, 0.5, 1], [1, 0.6, 0.3]);
-  const bgOpacity2 = useTransform(smoothProgress, [0, 0.5, 1], [0, 0.4, 0.7]);
-
-  // Section reveals
-  const howOpacity = useTransform(scrollYProgress, [0.2, 0.38], [0, 1]);
-  const howY = useTransform(scrollYProgress, [0.2, 0.38], [60, 0]);
-  const featOpacity = useTransform(scrollYProgress, [0.55, 0.7], [0, 1]);
-  const featY = useTransform(scrollYProgress, [0.55, 0.7], [60, 0]);
-
   return (
     <div
-      ref={containerRef}
-      className="relative overflow-x-hidden"
-      style={{ height: "320vh" }}
+      className="relative min-h-screen flex flex-col overflow-hidden"
+      style={{ background: "linear-gradient(160deg, #0D0820 0%, #1A1040 40%, #0F0B2E 100%)" }}
     >
-      {/* Sticky gradient background that morphs with scroll */}
-      <div className="sticky top-0 h-screen overflow-hidden pointer-events-none" aria-hidden="true">
-        <motion.div
-          className="absolute inset-0"
-          style={{ opacity: bgOpacity1 }}
-        >
-          <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, #ABABFF 0%, #BFBFFF 30%, #D3D3FF 60%, #F3F3FF 100%)" }} />
-        </motion.div>
-        <motion.div
-          className="absolute inset-0"
-          style={{ opacity: bgOpacity2 }}
-        >
-          <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, #7070CC 0%, #9090EE 30%, #ABABFF 60%, #D3D3FF 100%)" }} />
-        </motion.div>
-
-        {/* Radial glows */}
-        <div className="absolute w-[560px] h-[560px] rounded-full -top-40 -left-40 opacity-40"
-          style={{ background: "radial-gradient(circle, #FFFFFF, transparent 65%)" }} />
-        <div className="absolute w-[400px] h-[400px] rounded-full -bottom-24 -right-24 opacity-30"
-          style={{ background: "radial-gradient(circle, #E6E6FF, transparent 65%)" }} />
-
-        {/* Cinematic orbs that drift in on scroll */}
-        <motion.div
-          className="absolute w-[600px] h-[600px] rounded-full"
-          style={{
-            top: "50%",
-            left: "50%",
-            x: "-50%",
-            y: "-50%",
-            opacity: useTransform(scrollYProgress, [0.15, 0.45], [0, 0.15]),
-            scale: useTransform(scrollYProgress, [0.15, 0.45], [0.6, 1.1]),
-            background: "radial-gradient(circle, #8080FF, transparent 70%)",
-          }}
-        />
+      {/* Background orbs */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <Orb cx="20%"  cy="25%"  r="420px" color="#8080FF" opacity={0.18} delay={0} />
+        <Orb cx="80%"  cy="15%"  r="320px" color="#ABABFF" opacity={0.12} delay={2} />
+        <Orb cx="55%"  cy="70%"  r="500px" color="#6060CC" opacity={0.15} delay={1} />
+        <Orb cx="90%"  cy="85%"  r="260px" color="#C0A0FF" opacity={0.10} delay={3} />
+        {/* Noise-like grain layer */}
+        <div className="absolute inset-0 opacity-[0.03]"
+          style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")", backgroundSize: "128px" }} />
       </div>
 
-      {/* All scrollable content — position: sticky within the tall container */}
-      <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden">
-
-        {/* Floating pills — parallax on scroll */}
-        {PILLS.map((pill, i) => (
-          <ParallaxPill key={pill.text} pill={pill} index={i} scrollYProgress={scrollYProgress} />
-        ))}
-
-        {/* ── HERO SECTION ── */}
-        <motion.div
-          ref={heroRef}
-          style={{ y: heroY, scale: heroScale, opacity: heroOpacity }}
-          className="relative z-10 flex flex-col items-center text-center px-6 max-w-md w-full will-change-transform"
+      {/* Top brand strip */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 flex items-center justify-between px-6 pt-14 pb-2"
+      >
+        <span className="font-brand text-2xl text-white/90 tracking-tight">Aura</span>
+        <Link
+          href="/sign-in"
+          className="text-sm font-semibold text-white/60 hover:text-white transition-colors"
         >
-          {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.7 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
-            className="mb-7"
-          >
-            <div className="glass w-20 h-20 mx-auto rounded-[28px] flex items-center justify-center">
-              <svg width="42" height="42" viewBox="0 0 32 32" fill="none">
-                <circle cx="11" cy="16" r="9" fill="#8080FF" opacity="0.7" />
-                <circle cx="21" cy="16" r="9" fill="#ABABFF" opacity="0.65" />
-              </svg>
-            </div>
-          </motion.div>
+          Sign in
+        </Link>
+      </motion.div>
 
+      {/* Hero — fills the rest of the screen */}
+      <div className="relative z-10 flex-1 flex flex-col justify-between px-6 pb-12 pt-8">
+
+        {/* Big headline */}
+        <div>
           <motion.h1
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.5 }}
-            className="font-brand text-[76px] leading-none mb-4 tracking-tight"
-            style={{ color: "#1E1B4B" }}
+            transition={{ delay: 0.15, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="font-display font-black leading-[0.9] tracking-tight uppercase"
+            style={{ fontSize: "clamp(56px, 16vw, 88px)", color: "#FFFFFF" }}
           >
-            Aura
+            FIND
+            <br />
+            <span style={{ color: "#ABABFF" }}>YOUR</span>
+            <br />
+            AURA
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.5 }}
-            className="text-[22px] font-display font-semibold leading-snug mb-3"
-            style={{ color: "#3D3A7A" }}
-          >
-            Connect beyond the surface.
-          </motion.p>
-
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.32, duration: 0.5 }}
-            className="text-base leading-relaxed mb-10"
-            style={{ color: "#7070AA" }}
+            className="mt-5 text-base leading-relaxed max-w-xs"
+            style={{ color: "rgba(255,255,255,0.55)" }}
           >
-            No photos. No swiping. Just real compatibility<br />based on who you actually are.
+            No photos. No swiping. Real compatibility — based entirely on who you actually are.
           </motion.p>
+        </div>
 
+        {/* Floating personality badges — scattered around middle */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
+          className="hidden sm:block relative h-40 my-4"
+          aria-hidden="true"
+        >
+          {[
+            { text: "INTJ",         left: "3%",  top: "10%", r: "-6deg"  },
+            { text: "bookworm",     left: "55%", top: "0%",  r: "4deg"   },
+            { text: "deep thinker", left: "68%", top: "50%", r: "-5deg"  },
+            { text: "music lover",  left: "5%",  top: "60%", r: "7deg"   },
+            { text: "ENFP",         left: "38%", top: "72%", r: "-3deg"  },
+            { text: "night owl",    left: "78%", top: "15%", r: "5deg"   },
+          ].map((p, i) => (
+            <motion.span
+              key={p.text}
+              className="absolute inline-block px-4 py-2 rounded-full text-sm font-semibold select-none"
+              style={{
+                left: p.left, top: p.top, rotate: p.r,
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(171,171,255,0.25)",
+                color: "rgba(171,171,255,0.85)",
+                backdropFilter: "blur(10px)",
+              }}
+              animate={{ y: [0, i % 2 === 0 ? -6 : 6, 0] }}
+              transition={{ duration: 4 + i * 0.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
+            >
+              {p.text}
+            </motion.span>
+          ))}
+        </motion.div>
+
+        {/* CTA buttons */}
+        <div className="flex flex-col gap-3 w-full max-w-sm">
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.42, duration: 0.5 }}
-            className="flex flex-col gap-3 w-full"
+            transition={{ delay: 0.45, duration: 0.5 }}
           >
             <Link
               href="/sign-up"
-              className="btn-glass-primary h-14 flex items-center justify-center rounded-2xl font-semibold text-base text-white"
+              className="flex items-center justify-center w-full h-14 rounded-full font-bold text-base text-white transition-all active:scale-[0.97]"
+              style={{ background: "#8080FF", boxShadow: "0 8px 32px rgba(128,128,255,0.45)" }}
             >
-              Create your account
+              Create account
             </Link>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.54, duration: 0.5 }}
+          >
             <Link
               href="/sign-in"
-              className="btn-glass-ghost h-14 flex items-center justify-center rounded-2xl font-semibold text-base"
-              style={{ color: "#3D3A7A" }}
+              className="flex items-center justify-center w-full h-14 rounded-full font-bold text-base transition-all active:scale-[0.97]"
+              style={{
+                background: "rgba(255,255,255,0.08)",
+                border: "1.5px solid rgba(255,255,255,0.18)",
+                color: "rgba(255,255,255,0.85)",
+              }}
             >
               Sign in
             </Link>
           </motion.div>
 
-          <motion.div
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.65, duration: 0.5 }}
-            className="mt-10 flex items-center gap-5"
+            transition={{ delay: 0.7 }}
+            className="text-center text-xs mt-1"
+            style={{ color: "rgba(255,255,255,0.3)" }}
           >
-            {["Personality-first", "Privacy-focused", "No photos"].map((tag, i) => (
-              <span key={tag} className="flex items-center gap-2 text-xs font-medium" style={{ color: "#9090BB" }}>
-                {i !== 0 && <span className="w-1 h-1 rounded-full" style={{ background: "#BFBFFF" }} />}
-                {tag}
-              </span>
-            ))}
-          </motion.div>
-
-          {/* Scroll hint arrow */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 1, 0] }}
-            transition={{ delay: 1.5, duration: 2, repeat: Infinity, repeatDelay: 1 }}
-            className="absolute -bottom-20 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
-          >
-            <span className="text-xs font-medium" style={{ color: "#9090BB" }}>scroll to explore</span>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 3v10M4 9l4 4 4-4" stroke="#ABABFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </motion.div>
-        </motion.div>
-
-        {/* ── HOW IT WORKS ── */}
-        <motion.div
-          style={{ opacity: howOpacity, y: howY }}
-          className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-6 max-w-xl mx-auto w-full pointer-events-none"
-        >
-          <p className="text-center text-xs font-semibold uppercase tracking-widest mb-8" style={{ color: "#8080FF" }}>
-            How it works
-          </p>
-          <div className="flex flex-col gap-4">
-            {HOW_STEPS.map((step, i) => (
-              <motion.div
-                key={step.title}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.4 }}
-                className="glass rounded-2xl px-5 py-4 flex items-start gap-4 pointer-events-auto"
-              >
-                <div className="shrink-0 w-11 h-11 rounded-xl bg-primary-pale flex items-center justify-center">
-                  {step.icon}
-                </div>
-                <div>
-                  <p className="font-display font-semibold text-ink text-sm leading-tight mb-0.5">{step.title}</p>
-                  <p className="text-ink-secondary text-xs leading-relaxed">{step.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* ── FEATURES ── */}
-        <motion.div
-          style={{ opacity: featOpacity, y: featY }}
-          className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-6 max-w-xl mx-auto w-full pointer-events-none"
-        >
-          <p className="text-center text-xs font-semibold uppercase tracking-widest mb-8" style={{ color: "#8080FF" }}>
-            Built different
-          </p>
-          <div className="grid grid-cols-1 gap-4">
-            {FEATURES.map((f, i) => (
-              <motion.div
-                key={f.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12, duration: 0.4 }}
-                className="glass rounded-2xl p-5 pointer-events-auto"
-              >
-                <div className="text-2xl mb-2">{f.emoji}</div>
-                <p className="font-display font-semibold text-ink text-sm mb-1">{f.title}</p>
-                <p className="text-ink-secondary text-xs leading-relaxed">{f.body}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Final CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            className="mt-8 flex flex-col gap-3 pointer-events-auto"
-          >
-            <Link
-              href="/sign-up"
-              className="btn-glass-primary h-14 flex items-center justify-center rounded-2xl font-semibold text-base text-white"
-            >
-              Find your match
-            </Link>
-          </motion.div>
-        </motion.div>
+            Personality-first · Privacy-focused · No photos
+          </motion.p>
+        </div>
       </div>
     </div>
   );
