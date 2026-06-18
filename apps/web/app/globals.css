@@ -1,23 +1,24 @@
 @import "tailwindcss";
 
 @theme {
-  /* Brand colors — periwinkle palette */
-  --color-primary: #8080FF;
-  --color-primary-light: #ABABFF;
-  --color-primary-pale: #E6E6FF;
+  /* Brand colors — light lavender palette */
+  --color-primary: #9B7FE8;
+  --color-primary-dark: #7B5BE0;
+  --color-primary-light: #C4AFF5;
+  --color-primary-pale: #EDE8FF;
 
   /* Surface colors */
-  --color-surface: #F3F3FF;
-  --color-surface-deep: #D3D3FF;
+  --color-surface: #F8F4FF;
+  --color-surface-deep: #EDE8FF;
 
   /* Text colors */
-  --color-ink: #1E1B4B;
-  --color-ink-secondary: #5B5B8A;
-  --color-ink-muted: #9090BB;
+  --color-ink: #1E1040;
+  --color-ink-secondary: #4A3870;
+  --color-ink-muted: #9080B8;
 
   /* Utility colors */
-  --color-divider: #E0E0FF;
-  --color-focus-ring: #ABABFF;
+  --color-divider: #E3D9FF;
+  --color-focus-ring: #C4AFF5;
   --color-success: #10B981;
   --color-danger: #EF4444;
 
@@ -30,7 +31,9 @@
   --animate-blob: blob 10s ease-in-out infinite;
   --animate-blob-delay: blob 12s ease-in-out 2s infinite;
   --animate-blob-slow: blob 14s ease-in-out 4s infinite;
-  --animate-glow-pulse: glow-pulse 2.5s ease-in-out forwards;
+  --animate-float: float 4s ease-in-out infinite;
+  --animate-float-slow: float 6s ease-in-out infinite;
+  --animate-heart-beat: heart-beat 1.8s ease-in-out infinite;
 }
 
 @keyframes blob {
@@ -39,20 +42,16 @@
   66% { transform: translate(-18px, 12px) scale(0.94); }
 }
 
-@keyframes glow-pulse {
-  0%   { opacity: 0; transform: scale(0.95); }
-  40%  { opacity: 0.28; transform: scale(1.05); }
-  100% { opacity: 0; transform: scale(1); }
-}
-
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(var(--rotate, 0deg)); }
-  50%       { transform: translateY(-10px) rotate(var(--rotate, 0deg)); }
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-12px) scale(1.02); }
 }
 
-@keyframes float-reverse {
-  0%, 100% { transform: translateY(0px) rotate(var(--rotate, 0deg)); }
-  50%       { transform: translateY(10px) rotate(var(--rotate, 0deg)); }
+@keyframes heart-beat {
+  0%, 100% { transform: scale(1); }
+  20% { transform: scale(1.08); }
+  40% { transform: scale(1); }
+  60% { transform: scale(1.05); }
 }
 
 @keyframes fade-in-up {
@@ -60,117 +59,63 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── Liquid Glass (macOS Tahoe style) ─── */
-
-/* Base glass surface — panels, cards */
-.glass {
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(40px) saturate(200%);
-  -webkit-backdrop-filter: blur(40px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.82);
-  box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(128, 128, 255, 0.06),
-    0 8px 32px rgba(128, 128, 255, 0.10);
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-/* Lighter float glass — pills, badges */
-.glass-float {
-  background: rgba(255, 255, 255, 0.45);
+/* ─── Glass effects ─── */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1.5px solid rgba(255, 255, 255, 0.78);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 4px 16px rgba(128, 128, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 24px rgba(155, 127, 232, 0.08);
 }
 
-/* Primary button — glass over periwinkle */
+/* Primary button */
 .btn-glass-primary {
   position: relative;
-  background: #8080FF;
+  background: linear-gradient(135deg, #9B7FE8 0%, #7B5BE0 100%);
   color: white;
-  box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.28),
-    0 4px 20px rgba(128, 128, 255, 0.38);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  box-shadow: 0 4px 20px rgba(155, 127, 232, 0.40);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
   overflow: hidden;
 }
 .btn-glass-primary::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.14) 0%, transparent 60%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 60%);
   pointer-events: none;
 }
 .btn-glass-primary:hover:not(:disabled) {
-  background: #9090FF;
-  box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.32),
-    0 8px 32px rgba(128, 128, 255, 0.55);
+  box-shadow: 0 8px 32px rgba(155, 127, 232, 0.55);
   transform: scale(1.02) translateY(-1px);
 }
 .btn-glass-primary:active:not(:disabled) {
   transform: scale(0.97) translateY(0);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 2px 10px rgba(128, 128, 255, 0.3);
 }
 
-/* Ghost / glass button */
+/* Ghost button */
 .btn-glass-ghost {
   position: relative;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1.5px solid rgba(255, 255, 255, 0.65);
-  box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.8),
-    0 4px 16px rgba(128, 128, 255, 0.08);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
-  overflow: hidden;
-}
-.btn-glass-ghost::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 55%);
-  pointer-events: none;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(155, 127, 232, 0.3);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 .btn-glass-ghost:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.55);
-  border-color: rgba(255, 255, 255, 0.9);
-  box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
-    0 8px 28px rgba(128, 128, 255, 0.16);
-  transform: scale(1.02) translateY(-1px);
+  background: rgba(255, 255, 255, 0.8);
+  transform: scale(1.01) translateY(-1px);
 }
 .btn-glass-ghost:active:not(:disabled) {
   transform: scale(0.97);
 }
 
-/* Secondary / surface button */
-.btn-glass-secondary {
-  position: relative;
-  background: rgba(243, 243, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(224, 224, 255, 0.9);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px rgba(128, 128, 255, 0.06);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-}
-.btn-glass-secondary:hover:not(:disabled) {
-  background: rgba(230, 230, 255, 0.8);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 4px 16px rgba(128, 128, 255, 0.12);
-  transform: scale(1.01) translateY(-0.5px);
-}
-.btn-glass-secondary:active:not(:disabled) {
-  transform: scale(0.97);
-}
-
 /* ─── end glass ─── */
 
-/* Hide scrollbar but keep scrollable */
 .scrollbar-hide {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -179,19 +124,16 @@
   display: none;
 }
 
-/* Base */
 body {
-  background-color: #FFFFFF;
-  color: #1E1B4B;
+  background-color: #F8F4FF;
+  color: #1E1040;
 }
 
-/* Global focus ring */
 :focus-visible {
-  outline: 2px solid #ABABFF;
+  outline: 2px solid #C4AFF5;
   outline-offset: 2px;
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

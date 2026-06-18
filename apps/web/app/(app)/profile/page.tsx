@@ -118,50 +118,79 @@ export default function ProfilePage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
       >
-        {/* Profile header */}
-        <div className="flex items-center gap-4 mb-4">
-          {/* Avatar + edit button */}
-          <div className="flex flex-col items-center gap-1.5 shrink-0">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <Avatar3D
-                avatarUrl={null}
-                avatarConfig={profile?.avatar_config}
-                name={profile?.first_name ?? "?"}
-                size={80}
-                animate
-              />
-            </motion.div>
-            <button
-              type="button"
-              onClick={openAvatarEditor}
-              className="flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/70 transition-colors"
-            >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M9 1.5L10.5 3 4.5 9H3V7.5L9 1.5Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              {profile?.avatar_config ? "Edit avatar" : "Create avatar"}
-            </button>
-          </div>
+        {/* Profile header card */}
+        <div
+          className="rounded-3xl p-6 mb-6 flex flex-col items-center text-center relative overflow-hidden"
+          style={{ background: "linear-gradient(145deg, #EDE8FF 0%, #F5F0FF 60%, #FDE8EF 100%)" }}
+        >
+          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(circle at 50% 20%, rgba(196,175,245,0.4) 0%, transparent 70%)" }} />
 
-          <div className="flex-1">
-            <h1 className="font-display text-[22px] text-ink">
-              {profile?.first_name}
-            </h1>
-            <p className="text-sm text-ink-secondary">
-              {completedCount} of {QUESTIONS.length} questions answered
-            </p>
-          </div>
+          {/* Avatar */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="mb-3"
+          >
+            <Avatar3D
+              avatarUrl={null}
+              avatarConfig={profile?.avatar_config}
+              name={profile?.first_name ?? "?"}
+              size={90}
+              animate
+            />
+          </motion.div>
+
+          <h1 className="font-display font-black text-[22px] mb-0.5" style={{ color: "#1E1040" }}>
+            {profile?.first_name}
+          </h1>
+          <p className="text-sm mb-4" style={{ color: "#9080B8" }}>
+            {completedCount} of {QUESTIONS.length} questions answered
+          </p>
+
+          {/* Edit profile pill */}
           <button
             type="button"
             onClick={() => router.push("/profile-setup")}
-            className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold border transition-all hover:bg-white/70"
+            style={{ borderColor: "rgba(155,127,232,0.35)", color: "#9B7FE8", background: "rgba(255,255,255,0.55)" }}
           >
-            Edit profile
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M9 1.5L10.5 3 4.5 9H3V7.5L9 1.5Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Edit Profile
           </button>
+        </div>
+
+        {/* Avatar edit */}
+        <div className="flex gap-2 mb-6">
+          <button
+            type="button"
+            onClick={openAvatarEditor}
+            className="btn-glass-primary flex-1 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M12 2L14 4 5 13H3V11L12 2Z" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            {profile?.avatar_config ? "Edit avatar" : "Create avatar"}
+          </button>
+        </div>
+
+        {/* Your Journey stats */}
+        <div className="rounded-2xl p-5 mb-6 bg-white" style={{ boxShadow: "0 2px 16px rgba(155,127,232,0.08)" }}>
+          <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: "#9080B8" }}>Your Journey</p>
+          <div className="flex gap-4">
+            {[
+              { value: Object.keys(answers).length, label: "Answered" },
+              { value: completedCount, label: "Progress" },
+              { value: QUESTIONS.length, label: "Total Q's" },
+            ].map((stat) => (
+              <div key={stat.label} className="flex-1 text-center">
+                <p className="font-display font-black text-2xl" style={{ color: "#9B7FE8" }}>{stat.value}</p>
+                <p className="text-xs" style={{ color: "#9080B8" }}>{stat.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Avatar builder modal */}
@@ -213,14 +242,29 @@ export default function ProfilePage() {
           )}
         </AnimatePresence>
 
-        {/* Completion bar */}
-        <div className="mb-6">
-          <div className="w-full h-1.5 bg-surface-deep rounded-full overflow-hidden">
-            <div
-              className="h-full bg-primary-light rounded-full transition-[width] duration-500"
-              style={{ width: `${(completedCount / QUESTIONS.length) * 100}%` }}
-            />
-          </div>
+        {/* Settings rows */}
+        <div className="rounded-2xl bg-white mb-6 overflow-hidden" style={{ boxShadow: "0 2px 16px rgba(155,127,232,0.08)" }}>
+          {[
+            { icon: "⚙️", label: "Preferences",   onClick: () => router.push("/profile-setup") },
+            { icon: "🚫", label: "Blocked Users",  onClick: () => {} },
+            { icon: "❓", label: "Help & Support", onClick: () => {} },
+          ].map((row, i, arr) => (
+            <button
+              key={row.label}
+              type="button"
+              onClick={row.onClick}
+              className="w-full flex items-center justify-between px-5 py-4 hover:bg-surface transition-colors text-left"
+              style={{ borderBottom: i < arr.length - 1 ? "1px solid #E3D9FF" : "none" }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-lg">{row.icon}</span>
+                <span className="text-sm font-medium" style={{ color: "#1E1040" }}>{row.label}</span>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M6 4l4 4-4 4" stroke="#C4AFF5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          ))}
         </div>
 
         {/* Bio */}

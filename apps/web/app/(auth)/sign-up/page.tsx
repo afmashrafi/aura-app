@@ -27,9 +27,9 @@ function SelectRow({ label, selected, onClick }: { label: string; selected: bool
       whileTap={{ scale: 0.98 }}
       className="flex items-center justify-between w-full px-5 h-[60px] rounded-2xl text-base font-medium transition-all text-left"
       style={{
-        background: selected ? "#E6E6FF" : "#F8F8FF",
-        border: `2px solid ${selected ? "#8080FF" : "transparent"}`,
-        color: "#1E1B4B",
+        background: selected ? "#EDE8FF" : "#F8F4FF",
+        border: `2px solid ${selected ? "#9B7FE8" : "transparent"}`,
+        color: "#1E1040",
       }}
     >
       <span>{label}</span>
@@ -37,7 +37,7 @@ function SelectRow({ label, selected, onClick }: { label: string; selected: bool
         animate={{ scale: selected ? 1 : 0.5, opacity: selected ? 1 : 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 20 }}
         className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-        style={{ background: "#8080FF" }}
+        style={{ background: "#9B7FE8" }}
       >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M2.5 7l3 3 6-7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -56,7 +56,7 @@ function CircleNext({ onClick, disabled, loading }: { onClick: () => void; disab
       whileTap={{ scale: 0.9 }}
       className="w-16 h-16 rounded-full flex items-center justify-center shrink-0 transition-all"
       style={{
-        background: disabled ? "#E0E0FF" : "#8080FF",
+        background: disabled ? "#EDE8FF" : "#9B7FE8",
         boxShadow: disabled ? "none" : "0 8px 28px rgba(128,128,255,0.45)",
       }}
     >
@@ -231,11 +231,11 @@ export default function SignUpPage() {
             {/* Question */}
             <h1
               className="font-display font-black leading-tight mb-2"
-              style={{ fontSize: "clamp(28px, 8vw, 38px)", color: "#1E1B4B" }}
+              style={{ fontSize: "clamp(28px, 8vw, 38px)", color: "#1E1040" }}
             >
               {current.question}
             </h1>
-            <p className="text-sm mb-7 leading-relaxed" style={{ color: "#9090BB" }}>
+            <p className="text-sm mb-7 leading-relaxed" style={{ color: "#9080B8" }}>
               {current.hint}
             </p>
 
@@ -260,7 +260,7 @@ export default function SignUpPage() {
                   type="button"
                   onClick={goBack}
                   className="flex items-center gap-1.5 text-sm font-semibold"
-                  style={{ color: "#9090BB" }}
+                  style={{ color: "#9080B8" }}
                 >
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M12 5l-5 5 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -277,14 +277,14 @@ export default function SignUpPage() {
             </div>
 
             {step === 0 && (
-              <p className="text-center text-xs mt-5" style={{ color: "#9090BB" }}>
+              <p className="text-center text-xs mt-5" style={{ color: "#9080B8" }}>
                 Already have an account?{" "}
-                <Link href="/sign-in" className="font-semibold underline" style={{ color: "#8080FF" }}>Sign in</Link>
+                <Link href="/sign-in" className="font-semibold underline" style={{ color: "#9B7FE8" }}>Sign in</Link>
               </p>
             )}
 
             {isLast && (
-              <p className="text-center text-xs mt-4 leading-relaxed" style={{ color: "#9090BB" }}>
+              <p className="text-center text-xs mt-4 leading-relaxed" style={{ color: "#9080B8" }}>
                 By creating an account you agree to our Terms of Service and Privacy Policy.
               </p>
             )}

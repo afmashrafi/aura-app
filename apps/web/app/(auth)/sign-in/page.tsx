@@ -43,22 +43,29 @@ export default function SignInPage() {
   }
 
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ background: "linear-gradient(160deg, #0D0820 0%, #1A1040 50%, #0F0B2E 100%)" }}
-    >
-      {/* Dark hero top */}
-      <div className="relative flex flex-col justify-end px-6 pt-16 pb-10 overflow-hidden" style={{ minHeight: "36vh" }}>
-        {/* Glow orbs */}
+    <div className="min-h-screen flex flex-col" style={{ background: "#F9F7FF" }}>
+      {/* Top illustration area */}
+      <div className="relative flex flex-col justify-end px-6 pt-12 pb-8 overflow-hidden" style={{ minHeight: "32vh" }}>
+        {/* Background blobs */}
         <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div className="absolute w-64 h-64 rounded-full -top-20 -left-20 opacity-20"
-            style={{ background: "radial-gradient(circle, #8080FF, transparent 65%)" }} />
-          <div className="absolute w-48 h-48 rounded-full top-0 right-0 opacity-15"
-            style={{ background: "radial-gradient(circle, #ABABFF, transparent 65%)" }} />
+          <motion.div
+            className="absolute rounded-full"
+            style={{ width: 260, height: 260, top: -80, left: -60, background: "radial-gradient(circle, rgba(196,175,245,0.5), transparent 70%)" }}
+            animate={{ scale: [1, 1.08, 1] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute rounded-full"
+            style={{ width: 180, height: 180, top: -20, right: -40, background: "radial-gradient(circle, rgba(155,127,232,0.3), transparent 70%)" }}
+            animate={{ scale: [1, 1.06, 1] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          />
         </div>
 
-        <Link href="/" className="absolute top-14 left-6">
-          <span className="font-brand text-xl text-white/80">Aura</span>
+        <Link href="/" className="absolute top-12 left-6">
+          <span className="font-brand text-xl font-bold" style={{ color: "#9B7FE8" }}>
+            aura<sup className="text-xs font-normal">+</sup>
+          </span>
         </Link>
 
         <motion.div
@@ -66,28 +73,25 @@ export default function SignInPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
-          <h1
-            className="font-display font-black uppercase leading-none mb-3"
-            style={{ fontSize: "clamp(40px, 12vw, 60px)", color: "#FFFFFF" }}
-          >
-            WELCOME<br /><span style={{ color: "#ABABFF" }}>BACK</span>
+          <h1 className="font-display font-black leading-none mb-2" style={{ fontSize: "clamp(36px, 11vw, 52px)", color: "#1E1040" }}>
+            Welcome<br /><span style={{ color: "#9B7FE8" }}>back.</span>
           </h1>
-          <p className="text-sm" style={{ color: "rgba(255,255,255,0.45)" }}>
+          <p className="text-sm" style={{ color: "#9080B8" }}>
             Don&apos;t have an account?{" "}
-            <Link href="/sign-up" className="font-semibold underline-offset-2 underline" style={{ color: "#ABABFF" }}>
+            <Link href="/sign-up" className="font-semibold underline-offset-2 underline" style={{ color: "#9B7FE8" }}>
               Sign up
             </Link>
           </p>
         </motion.div>
       </div>
 
-      {/* White bottom sheet */}
+      {/* White form card */}
       <motion.div
-        initial={{ opacity: 0, y: 40 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ delay: 0.15, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className="flex-1 bg-white rounded-t-[32px] px-6 pt-8 pb-12"
-        style={{ boxShadow: "0 -4px 40px rgba(0,0,0,0.25)" }}
+        style={{ boxShadow: "0 -4px 32px rgba(155,127,232,0.12)" }}
       >
         <div className="max-w-sm mx-auto">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
@@ -131,13 +135,12 @@ export default function SignInPage() {
             </Button>
           </form>
 
-          {/* Feature pills */}
           <div className="flex flex-wrap gap-2 justify-center mt-8">
             {["Personality-first", "Privacy-focused", "No photos"].map((tag) => (
               <span
                 key={tag}
                 className="text-xs font-medium px-3 py-1.5 rounded-full"
-                style={{ background: "#F3F3FF", color: "#8080FF" }}
+                style={{ background: "#EDE8FF", color: "#9B7FE8" }}
               >
                 {tag}
               </span>
